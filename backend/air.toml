@@ -1,0 +1,28 @@
+# See https://github.com/air-verse/air for config options
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  # The command Air runs to rebuild your Go app
+  cmd = "go build -o main ."
+  # The binary Air executes after a successful build
+  bin = "./main"
+  # The directory where Air looks for code changes (mounted volume)
+  full_bin = "./main"
+  # Watch all .go files
+  include_ext = ["go"]
+  exclude_dir = ["vendor", "tmp"]
+  # Delay between rebuilds (in ms)
+  delay = 1000
+  # Show build errors immediately
+  stop_on_error = false
+
+[color]
+  main = "yellow"
+  watcher = "cyan"
+  build = "green"
+  runner = "magenta"
+  error = "red"
+
+[log]
+  time = true

@@ -2,15 +2,41 @@
 version: '3.8'
 services:
   postgres:
-  image: postgres:15
-  restart: unless-stopped
-  environment:
-    POSTGRES_USER: iglight
-    POSTGRES_PASSWORD: iglight
-    POSTGRES_DB: iglight
-  ports:
-    - "5432:5432"
-  volumes:
-    - pgdata:/var/lib/postgresql/data
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: iglight
+      POSTGRES_PASSWORD: iglight
+      POSTGRES_DB: iglight
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: dev.Dockerfile
+    volumes:
+      - ../backend:/app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    env_file:
+      - ../backend/.env
+    command: air
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: dev.Dockerfile
+    volumes:
+      - ../frontend:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    env_file:
+      - ../frontend/.env
 volumes:
   pgdata:

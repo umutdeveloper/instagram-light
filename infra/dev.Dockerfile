@@ -1,23 +1,41 @@
 # VSCode Dev Container Dockerfile
-FROM ubuntu:latest
+FROM ubuntu:24.04
+
+# Prevent apt from prompting for input
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies
 RUN apt-get update && \
-	apt-get install -y git curl build-essential ca-certificates && \
-	# Install Node.js v20 (using NodeSource)
-	curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-	apt-get install -y nodejs && \
-	# Install pnpm
-	npm install -g pnpm && \
-	# Install Go (latest stable)
-	curl -fsSL https://go.dev/dl/ | grep -o 'go[0-9.]*\.linux-amd64.tar.gz' | head -1 | xargs -I {} curl -O https://go.dev/dl/{} && \
-	tar -C /usr/local -xzf go*.linux-amd64.tar.gz && \
-	rm go*.linux-amd64.tar.gz && \
-	# Clean up
-	apt-get clean && rm -rf /var/lib/apt/lists/*
+    apt-get install -y git curl build-essential ca-certificates bash && \
+    \
+    # Install Node.js v20 (using NodeSource)
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install -g pnpm && \
+    \
+    # Detect architecture and install Go 1.25.2
+    ARCH=$(dpkg --print-architecture) && \
+    case "$ARCH" in \
+      amd64) GO_ARCH="linux-amd64" ;; \
+      arm64) GO_ARCH="linux-arm64" ;; \
+      *) echo "Unsupported architecture: $ARCH" && exit 1 ;; \
+    esac && \
+    curl -LO https://go.dev/dl/go1.25.2.${GO_ARCH}.tar.gz && \
+    tar -C /usr/local -xzf go1.25.2.${GO_ARCH}.tar.gz && \
+    rm go1.25.2.${GO_ARCH}.tar.gz && \
+    \
+    # Install dev tools (for convenience)
+    apt-get install -y zsh vim nano net-tools lsof && \
+    \
+    # Clean up
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set Go path
-ENV PATH="/usr/local/go/bin:$PATH"
+# Add Go to PATH
+ENV PATH="/usr/local/go/bin:${PATH}"
 
-# Set working directory
+# Create vscode user for VSCode Remote Containers
+RUN useradd -ms /usr/bin/zsh vscode && usermod -aG sudo vscode
+
+# Set working directory and default user
 WORKDIR /workspace
+USER vscode

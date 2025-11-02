@@ -1,10 +1,13 @@
-version: '3.8'
+version: "3.9"
+
 services:
   dev:
     build:
       context: ..
       dockerfile: infra/dev.Dockerfile
     volumes:
-      - ..:/workspace
+      - ..:/workspace:cached
     command: sleep infinity
     user: vscode
+    # optional but helps Dev Containers know this is your workspace
+    working_dir: /workspace

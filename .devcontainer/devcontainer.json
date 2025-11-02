@@ -1,21 +1,25 @@
 {
-    "name": "Multi-Service Dev Container",
-    "dockerComposeFile": "../infra/docker-compose.yml",
-    "service": "dev",
-    "workspaceFolder": "/workspace",
-    "remoteUser": "vscode",
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "golang.go",
-                "ms-vscode.vscode-typescript-next",
-                "dbaeumer.vscode-eslint",
-                "bradlc.vscode-tailwindcss",
-                "esbenp.prettier-vscode"
-            ],
-            "settings": {
-                "terminal.integrated.shell.linux": "/bin/bash"
-            }
-        }
+  "name": "Multi-Service Dev Container",
+  "dockerComposeFile": [
+    "docker-compose.yml",
+    "../infra/docker-compose.yml"
+  ],
+  "service": "dev",
+  "workspaceFolder": "/workspace",
+  "remoteUser": "vscode",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "golang.go",
+        "ms-vscode.vscode-typescript-next",
+        "dbaeumer.vscode-eslint",
+        "bradlc.vscode-tailwindcss",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.shell.linux": "/usr/bin/zsh"
+      }
     }
+  }
 }

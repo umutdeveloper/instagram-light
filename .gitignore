@@ -21,7 +21,6 @@ docker-compose.override.yml
 /dist/
 vendor/
 .env
-.env.*
 fiber.log
 
 # Node.js / Next.js
