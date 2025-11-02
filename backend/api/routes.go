@@ -9,4 +9,7 @@ func RegisterRoutes(app *fiber.App) {
 		return c.JSON(fiber.Map{"status": "ok"})
 	})
 	RegisterAuthRoutes(app)
+	RegisterUserRoutes(app)
+	RegisterPostRoutes(app)
+	RegisterFeedRoutes(app)
 }

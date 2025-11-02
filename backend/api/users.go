@@ -1,0 +1,86 @@
+package api
+
+import (
+	"strconv"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/umutdeveloper/instagram-light/backend/db"
+	"github.com/umutdeveloper/instagram-light/backend/models"
+)
+
+// register user routes
+func RegisterUserRoutes(app *fiber.App) {
+	app.Get("/api/users/:id", GetUserByID)
+	app.Get("/api/users/:id/followers", GetFollowers)
+	app.Get("/api/users/:id/following", GetFollowing)
+}
+
+// GetFollowers handles GET /api/users/:id/followers
+func GetFollowers(c *fiber.Ctx) error {
+	idParam := c.Params("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user ID"})
+	}
+
+	var followers []models.User
+	err = db.DB.Table("users").
+		Select("users.*").
+		Joins("JOIN follows ON follows.follower_id = users.id").
+		Where("follows.following_id = ?", id).
+		Find(&followers).Error
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch followers"})
+	}
+
+	// Hide password fields
+	for i := range followers {
+		followers[i].Password = ""
+	}
+
+	return c.JSON(followers)
+}
+
+// GetFollowing handles GET /api/users/:id/following
+func GetFollowing(c *fiber.Ctx) error {
+	idParam := c.Params("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user ID"})
+	}
+
+	var following []models.User
+	err = db.DB.Table("users").
+		Select("users.*").
+		Joins("JOIN follows ON follows.following_id = users.id").
+		Where("follows.follower_id = ?", id).
+		Find(&following).Error
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch following"})
+	}
+
+	// Hide password fields
+	for i := range following {
+		following[i].Password = ""
+	}
+
+	return c.JSON(following)
+}
+
+// GetUserByID handles GET /api/users/:id
+func GetUserByID(c *fiber.Ctx) error {
+	idParam := c.Params("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user ID"})
+	}
+
+	var user models.User
+	if err := db.DB.First(&user, id).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "User not found"})
+	}
+
+	// Hide password field
+	user.Password = ""
+	return c.JSON(user)
+}
