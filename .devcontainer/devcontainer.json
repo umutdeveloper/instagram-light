@@ -1,9 +1,6 @@
 {
   "name": "Multi-Service Dev Container",
-  "dockerComposeFile": [
-    "docker-compose.yml",
-    "../infra/docker-compose.yml"
-  ],
+  "dockerComposeFile": ["docker-compose.yml", "../infra/docker-compose.yml"],
   "service": "dev",
   "workspaceFolder": "/workspace",
   "remoteUser": "vscode",
@@ -14,7 +11,8 @@
         "ms-vscode.vscode-typescript-next",
         "dbaeumer.vscode-eslint",
         "bradlc.vscode-tailwindcss",
-        "esbenp.prettier-vscode"
+        "esbenp.prettier-vscode",
+        "eamodio.gitlens"
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "zsh",

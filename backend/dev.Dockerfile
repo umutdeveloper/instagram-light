@@ -7,17 +7,15 @@ WORKDIR /app
 RUN apk add --no-cache git curl && \
     go install github.com/air-verse/air@latest
 
-# Copy module files first (for caching)
-COPY go.mod go.sum* ./
-
-# Create go.mod if missing (first-time build)
-RUN [ -f go.mod ] || go mod init instagram-light-backend
-
-# Ensure dependencies are tidy
-RUN go mod tidy
-
 # Copy all source files
 COPY . .
+
+# Create go.mod if missing (first-time build)
+RUN [ -f go.mod ] || go mod init github.com/umutdeveloper/instagram-light/backend
+
+# Force Go to resolve and download all required deps from imports automatically
+RUN go mod tidy && go mod download
+
 
 # Disable CGO for lightweight binary builds
 ENV CGO_ENABLED=0

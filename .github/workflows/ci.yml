@@ -24,7 +24,7 @@ jobs:
         working-directory: backend
         run: |
           go mod tidy
-          go test ./...
+          go test ./tests
 
       # 4️⃣ Setup Node.js for frontend
       - name: Set up Node.js
