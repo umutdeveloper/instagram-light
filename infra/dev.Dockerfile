@@ -8,6 +8,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y git curl build-essential ca-certificates bash && \
     \
+    # Install OpenJDK 17 for openapi-generator and Java tools
+    apt-get install -y openjdk-17-jdk && \
+    \
     # Install Node.js v20 (using NodeSource)
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y nodejs && \

@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "jest"
+    "test": "jest",
+    "generate:api": "npx openapi-generator-cli generate -i ../backend/docs/swagger.yaml -g typescript-fetch -o ./src/api"
   },
   "dependencies": {
     "next": "^16.0.1",
@@ -15,6 +16,7 @@
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.25.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
