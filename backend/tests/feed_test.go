@@ -10,6 +10,7 @@ import (
 	"github.com/umutdeveloper/instagram-light/backend/api"
 	"github.com/umutdeveloper/instagram-light/backend/db"
 	"github.com/umutdeveloper/instagram-light/backend/models"
+	"github.com/umutdeveloper/instagram-light/backend/tests/helpers"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -26,9 +27,9 @@ func TestFeedPaginationAndFanOut(t *testing.T) {
 	app := setupFeedApp()
 
 	// Create users
-	user1 := models.User{Username: "user1", Password: "pass1"}
-	user2 := models.User{Username: "user2", Password: "pass2"}
-	user3 := models.User{Username: "user3", Password: "pass3"}
+	user1 := models.User{Username: "user1", Email: "user1@example.com", Password: "pass1"}
+	user2 := models.User{Username: "user2", Email: "user2@example.com", Password: "pass2"}
+	user3 := models.User{Username: "user3", Email: "user3@example.com", Password: "pass3"}
 	db.DB.Create(&user1)
 	db.DB.Create(&user2)
 	db.DB.Create(&user3)
@@ -38,6 +39,9 @@ func TestFeedPaginationAndFanOut(t *testing.T) {
 	follow3 := models.Follow{FollowerID: user1.ID, FollowingID: user3.ID}
 	db.DB.Create(&follow2)
 	db.DB.Create(&follow3)
+
+	// Generate JWT for user1
+	token := helpers.GenerateJWT(user1.ID, user1.Username)
 
 	// Create posts for all users
 	for i := 1; i <= 30; i++ {
@@ -54,6 +58,7 @@ func TestFeedPaginationAndFanOut(t *testing.T) {
 
 	// Get feed for user1, page 1, limit 10
 	req := httptest.NewRequest("GET", "/api/feed?user_id=1&page=1&limit=10", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
 	resp, _ := app.Test(req)
 	assert.Equal(t, 200, resp.StatusCode)
 	var respBody struct {
@@ -75,6 +80,7 @@ func TestFeedPaginationAndFanOut(t *testing.T) {
 
 	// Get feed for user1, page 2, limit 10
 	req2 := httptest.NewRequest("GET", "/api/feed?user_id=1&page=2&limit=10", nil)
+	req2.Header.Set("Authorization", "Bearer "+token)
 	resp2, _ := app.Test(req2)
 	assert.Equal(t, 200, resp2.StatusCode)
 	var respBody2 struct {
@@ -96,6 +102,7 @@ func TestFeedPaginationAndFanOut(t *testing.T) {
 
 	// Get feed for user1, page 4, limit 10 (should be empty)
 	req3 := httptest.NewRequest("GET", "/api/feed?user_id=1&page=4&limit=10", nil)
+	req3.Header.Set("Authorization", "Bearer "+token)
 	resp3, _ := app.Test(req3)
 	assert.Equal(t, 200, resp3.StatusCode)
 	var respBody3 struct {

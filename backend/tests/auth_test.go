@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/umutdeveloper/instagram-light/backend/api"
 	"github.com/umutdeveloper/instagram-light/backend/db"
+	"github.com/umutdeveloper/instagram-light/backend/models"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -18,7 +19,7 @@ import (
 func setupApp() *fiber.App {
 	os.Setenv("JWT_SECRET", "testsecret")
 	db.DB, _ = gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
-	db.DB.AutoMigrate(&api.User{})
+	db.DB.AutoMigrate(&models.User{})
 	app := fiber.New()
 	api.RegisterAuthRoutes(app)
 	return app
@@ -26,7 +27,7 @@ func setupApp() *fiber.App {
 
 func TestRegister(t *testing.T) {
 	app := setupApp()
-	body := map[string]string{"username": "testuser", "password": "testpass"}
+	body := map[string]string{"username": "testuser", "email": "testuser@example.com", "password": "testpass"}
 	jsonBody, _ := json.Marshal(body)
 	req := httptest.NewRequest("POST", "/api/auth/register", bytes.NewReader(jsonBody))
 	req.Header.Set("Content-Type", "application/json")
@@ -36,7 +37,7 @@ func TestRegister(t *testing.T) {
 
 func TestRegisterDuplicate(t *testing.T) {
 	app := setupApp()
-	body := map[string]string{"username": "testuser", "password": "testpass"}
+	body := map[string]string{"username": "testuser", "email": "testuser@example.com", "password": "testpass"}
 	jsonBody, _ := json.Marshal(body)
 	req := httptest.NewRequest("POST", "/api/auth/register", bytes.NewReader(jsonBody))
 	req.Header.Set("Content-Type", "application/json")
@@ -47,7 +48,7 @@ func TestRegisterDuplicate(t *testing.T) {
 
 func TestLoginSuccess(t *testing.T) {
 	app := setupApp()
-	regBody := map[string]string{"username": "testuser", "password": "testpass"}
+	regBody := map[string]string{"username": "testuser", "email": "testuser@example.com", "password": "testpass"}
 	jsonReg, _ := json.Marshal(regBody)
 	regReq := httptest.NewRequest("POST", "/api/auth/register", bytes.NewReader(jsonReg))
 	regReq.Header.Set("Content-Type", "application/json")

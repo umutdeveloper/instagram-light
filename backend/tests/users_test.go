@@ -10,6 +10,7 @@ import (
 	"github.com/umutdeveloper/instagram-light/backend/api"
 	"github.com/umutdeveloper/instagram-light/backend/db"
 	"github.com/umutdeveloper/instagram-light/backend/models"
+	"github.com/umutdeveloper/instagram-light/backend/tests/helpers"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -52,7 +53,9 @@ func TestGetUserByID(t *testing.T) {
 	db.DB.Create(&user)
 
 	// Test valid user
+	token := helpers.GenerateJWT(user.ID, user.Username)
 	req := httptest.NewRequest("GET", "/api/users/1", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
 	resp, _ := app.Test(req)
 	assert.Equal(t, 200, resp.StatusCode)
 	var got models.User
@@ -63,6 +66,7 @@ func TestGetUserByID(t *testing.T) {
 
 	// Test user not found
 	reqNF := httptest.NewRequest("GET", "/api/users/999", nil)
+	reqNF.Header.Set("Authorization", "Bearer "+token)
 	respNF, _ := app.Test(reqNF)
 	assert.Equal(t, 404, respNF.StatusCode)
 }
@@ -74,7 +78,9 @@ func TestGetFollowersAndFollowing(t *testing.T) {
 	setupUserFollowData()
 
 	// Test followers of alice (id=1)
+	token := helpers.GenerateJWT(1, "alice")
 	reqFollowers := httptest.NewRequest("GET", "/api/users/1/followers", nil)
+	reqFollowers.Header.Set("Authorization", "Bearer "+token)
 	respFollowers, _ := app.Test(reqFollowers)
 	assert.Equal(t, 200, respFollowers.StatusCode)
 	var followers []models.User
@@ -89,6 +95,7 @@ func TestGetFollowersAndFollowing(t *testing.T) {
 
 	// Test following of alice (id=1)
 	reqFollowing := httptest.NewRequest("GET", "/api/users/1/following", nil)
+	reqFollowing.Header.Set("Authorization", "Bearer "+token)
 	respFollowing, _ := app.Test(reqFollowing)
 	assert.Equal(t, 200, respFollowing.StatusCode)
 	var following []models.User
@@ -99,6 +106,7 @@ func TestGetFollowersAndFollowing(t *testing.T) {
 
 	// Test followers of bob (id=2)
 	reqFollowersBob := httptest.NewRequest("GET", "/api/users/2/followers", nil)
+	reqFollowersBob.Header.Set("Authorization", "Bearer "+token)
 	respFollowersBob, _ := app.Test(reqFollowersBob)
 	assert.Equal(t, 200, respFollowersBob.StatusCode)
 	var followersBob []models.User
@@ -108,6 +116,7 @@ func TestGetFollowersAndFollowing(t *testing.T) {
 
 	// Test following of bob (id=2)
 	reqFollowingBob := httptest.NewRequest("GET", "/api/users/2/following", nil)
+	reqFollowingBob.Header.Set("Authorization", "Bearer "+token)
 	respFollowingBob, _ := app.Test(reqFollowingBob)
 	assert.Equal(t, 200, respFollowingBob.StatusCode)
 	var followingBob []models.User

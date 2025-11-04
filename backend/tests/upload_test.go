@@ -13,6 +13,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/umutdeveloper/instagram-light/backend/api"
+	"github.com/umutdeveloper/instagram-light/backend/tests/helpers"
 )
 
 func setupUploadApp() *fiber.App {
@@ -44,8 +45,10 @@ func TestUploadMedia(t *testing.T) {
 	assert.NoError(t, err)
 	writer.Close()
 
+	token := helpers.GenerateJWT(1, "user1")
 	req := httptest.NewRequest("POST", "/api/upload", strings.NewReader(body.String()))
 	req.Header.Set("Content-Type", writer.FormDataContentType())
+	req.Header.Set("Authorization", "Bearer "+token)
 	resp, err := app.Test(req)
 	assert.NoError(t, err)
 	assert.Equal(t, 200, resp.StatusCode)
