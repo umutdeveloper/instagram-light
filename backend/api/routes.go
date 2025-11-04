@@ -8,6 +8,7 @@ func RegisterRoutes(app *fiber.App) {
 	app.Get("/health", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"status": "ok"})
 	})
+	app.Post("/api/upload", UploadMedia)
 	RegisterAuthRoutes(app)
 	RegisterUserRoutes(app)
 	RegisterPostRoutes(app)
