@@ -26,5 +26,5 @@ RUN go build -o main .
 # Expose backend port
 EXPOSE 8080
 
-# Default command starts Air with config
-CMD ["air", "-c", "air.toml"]
+# Default command starts Air with config through a shell for Fiber prefork
+CMD ["sh", "-c", "air -c air.toml"]

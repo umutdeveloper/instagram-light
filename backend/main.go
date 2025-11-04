@@ -36,7 +36,9 @@ func main() {
 
 	db.InitDB()
 
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		Prefork: true,
+	})
 
 	// Middleware
 	app.Use(logger.New())
