@@ -5,15 +5,17 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/umutdeveloper/instagram-light/backend/db"
+	"github.com/umutdeveloper/instagram-light/backend/middleware"
 	"github.com/umutdeveloper/instagram-light/backend/models"
 )
 
 // RegisterPostRoutes registers post-related routes
 func RegisterPostRoutes(app *fiber.App) {
-	app.Get("/api/posts", GetPosts)
-	app.Post("/api/posts", CreatePost)
-	app.Get("/api/posts/:id", GetPostByID)
-	app.Delete("/api/posts/:id", DeletePostByID)
+	posts := app.Group("/api/posts", middleware.JWTMiddleware())
+	posts.Get("/", GetPosts)
+	posts.Post("/", CreatePost)
+	posts.Get(":id", GetPostByID)
+	posts.Delete(":id", DeletePostByID)
 }
 
 // GetPosts handles GET /api/posts
@@ -25,6 +27,7 @@ func RegisterPostRoutes(app *fiber.App) {
 // @Param limit query int false "Page size"
 // @Success 200 {object} models.PostsResponse
 // @Failure 500 {object} models.ErrorResponse
+// @Security BearerAuth
 // @Router /api/posts [get]
 func GetPosts(c *fiber.Ctx) error {
 	// Pagination
@@ -62,6 +65,7 @@ func GetPosts(c *fiber.Ctx) error {
 // @Success 201 {object} models.Post
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
+// @Security BearerAuth
 // @Router /api/posts [post]
 func CreatePost(c *fiber.Ctx) error {
 	var post models.Post
@@ -86,6 +90,7 @@ func CreatePost(c *fiber.Ctx) error {
 // @Success 200 {object} models.Post
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 404 {object} models.ErrorResponse
+// @Security BearerAuth
 // @Router /api/posts/{id} [get]
 func GetPostByID(c *fiber.Ctx) error {
 	idParam := c.Params("id")
@@ -108,6 +113,7 @@ func GetPostByID(c *fiber.Ctx) error {
 // @Success 204 {string} string "No Content"
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
+// @Security BearerAuth
 // @Router /api/posts/{id} [delete]
 func DeletePostByID(c *fiber.Ctx) error {
 	idParam := c.Params("id")

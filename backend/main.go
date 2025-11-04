@@ -5,11 +5,19 @@
 // @contact.email support@example.com
 // @host localhost:8080
 // @BasePath /
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description JWT Authorization header using the Bearer scheme. Example: "Authorization: Bearer {token}"
 package main
 
 import (
 	"fmt"
 	"log"
+
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/umutdeveloper/instagram-light/backend/api"
@@ -29,6 +37,14 @@ func main() {
 	db.InitDB()
 
 	app := fiber.New()
+
+	// Middleware
+	app.Use(logger.New())
+	app.Use(recover.New())
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "http://localhost:3000, http://127.0.0.1:3000",
+		AllowCredentials: true,
+	}))
 
 	api.RegisterRoutes(app)
 

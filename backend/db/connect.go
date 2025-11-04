@@ -6,6 +6,8 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"github.com/umutdeveloper/instagram-light/backend/models"
 )
 
 var DB *gorm.DB
@@ -20,5 +22,15 @@ func InitDB() {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
 	DB = db
+
+	// AutoMigrate all main tables
+	if err := DB.AutoMigrate(
+		&models.User{},
+		&models.Post{},
+		&models.Like{},
+		&models.Follow{},
+	); err != nil {
+		log.Fatalf("Failed to migrate models: %v", err)
+	}
 	log.Println("Database connection established successfully")
 }

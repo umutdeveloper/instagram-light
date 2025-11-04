@@ -10,14 +10,7 @@ import (
 	"github.com/umutdeveloper/instagram-light/backend/db"
 	"github.com/umutdeveloper/instagram-light/backend/models"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
 )
-
-type User struct {
-	gorm.Model
-	Username string `gorm:"unique" json:"username"`
-	Password string `json:"password"`
-}
 
 // RegisterAuthRoutes registers authentication routes
 func RegisterAuthRoutes(app *fiber.App) {
@@ -44,9 +37,9 @@ func register(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to hash password"})
 	}
-	user := User{Username: body.Username, Password: string(hashed)}
+	user := models.User{Username: body.Username, Password: string(hashed)}
 	if err := db.DB.Create(&user).Error; err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Username already exists"})
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
 	return c.JSON(models.RegisterResponse{Message: "User registered successfully"})
 }
@@ -67,7 +60,7 @@ func login(c *fiber.Ctx) error {
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request"})
 	}
-	var user User
+	var user models.User
 	if err := db.DB.Where("username = ?", body.Username).First(&user).Error; err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid credentials"})
 	}

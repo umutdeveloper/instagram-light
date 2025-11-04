@@ -7,9 +7,15 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/umutdeveloper/instagram-light/backend/middleware"
 	"github.com/umutdeveloper/instagram-light/backend/models"
 	"github.com/umutdeveloper/instagram-light/backend/utils"
 )
+
+func registerUploadRoutes(app *fiber.App) {
+	upload := app.Group("/api/upload", middleware.JWTMiddleware())
+	upload.Post("/", UploadMedia)
+}
 
 // UploadMedia handles POST /api/upload
 // @Summary Upload media file
@@ -22,6 +28,7 @@ import (
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
+// @Security BearerAuth
 // @Router /api/upload [post]
 func UploadMedia(c *fiber.Ctx) error {
 	// Get file from form

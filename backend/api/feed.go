@@ -5,12 +5,14 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/umutdeveloper/instagram-light/backend/db"
+	"github.com/umutdeveloper/instagram-light/backend/middleware"
 	"github.com/umutdeveloper/instagram-light/backend/models"
 )
 
 // RegisterFeedRoutes registers the feed route
 func RegisterFeedRoutes(app *fiber.App) {
-	app.Get("/api/feed", GetFeed)
+	feed := app.Group("/api/feed", middleware.JWTMiddleware())
+	feed.Get("/", GetFeed)
 }
 
 // GetFeed handles GET /api/feed
@@ -24,6 +26,7 @@ func RegisterFeedRoutes(app *fiber.App) {
 // @Success 200 {object} models.FeedResponse
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
+// @Security BearerAuth
 // @Router /api/feed [get]
 func GetFeed(c *fiber.Ctx) error {
 	userIDParam := c.Query("user_id")

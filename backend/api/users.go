@@ -5,14 +5,16 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/umutdeveloper/instagram-light/backend/db"
+	"github.com/umutdeveloper/instagram-light/backend/middleware"
 	"github.com/umutdeveloper/instagram-light/backend/models"
 )
 
 // register user routes
 func RegisterUserRoutes(app *fiber.App) {
-	app.Get("/api/users/:id", GetUserByID)
-	app.Get("/api/users/:id/followers", GetFollowers)
-	app.Get("/api/users/:id/following", GetFollowing)
+	user := app.Group("/api/users", middleware.JWTMiddleware())
+	user.Get(":id", GetUserByID)
+	user.Get(":id/followers", GetFollowers)
+	user.Get(":id/following", GetFollowing)
 }
 
 // GetFollowers handles GET /api/users/:id/followers
@@ -24,6 +26,7 @@ func RegisterUserRoutes(app *fiber.App) {
 // @Success 200 {array} models.User
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
+// @Security BearerAuth
 // @Router /api/users/{id}/followers [get]
 func GetFollowers(c *fiber.Ctx) error {
 	idParam := c.Params("id")
@@ -59,6 +62,7 @@ func GetFollowers(c *fiber.Ctx) error {
 // @Success 200 {array} models.User
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 500 {object} models.ErrorResponse
+// @Security BearerAuth
 // @Router /api/users/{id}/following [get]
 func GetFollowing(c *fiber.Ctx) error {
 	idParam := c.Params("id")
@@ -94,6 +98,7 @@ func GetFollowing(c *fiber.Ctx) error {
 // @Success 200 {object} models.User
 // @Failure 400 {object} models.ErrorResponse
 // @Failure 404 {object} models.ErrorResponse
+// @Security BearerAuth
 // @Router /api/users/{id} [get]
 func GetUserByID(c *fiber.Ctx) error {
 	idParam := c.Params("id")

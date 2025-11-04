@@ -118,6 +118,11 @@ const docTemplate = `{
         },
         "/api/feed": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a paginated feed for a user (posts from followed users)",
                 "produces": [
                     "application/json"
@@ -171,6 +176,11 @@ const docTemplate = `{
         },
         "/api/posts": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a paginated list of posts",
                 "produces": [
                     "application/json"
@@ -209,6 +219,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Create a new post",
                 "consumes": [
                     "application/json"
@@ -255,6 +270,11 @@ const docTemplate = `{
         },
         "/api/posts/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a single post by its ID",
                 "produces": [
                     "application/json"
@@ -294,6 +314,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Delete a post by its ID",
                 "tags": [
                     "posts"
@@ -332,6 +357,11 @@ const docTemplate = `{
         },
         "/api/upload": {
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Uploads a media file and returns its storage path",
                 "consumes": [
                     "multipart/form-data"
@@ -376,6 +406,11 @@ const docTemplate = `{
         },
         "/api/users/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a user by their ID",
                 "produces": [
                     "application/json"
@@ -417,6 +452,11 @@ const docTemplate = `{
         },
         "/api/users/{id}/followers": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a list of followers for a user",
                 "produces": [
                     "application/json"
@@ -461,6 +501,11 @@ const docTemplate = `{
         },
         "/api/users/{id}/following": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Get a list of users this user is following",
                 "produces": [
                     "application/json"
@@ -644,6 +689,14 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }`
