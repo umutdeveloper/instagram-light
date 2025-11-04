@@ -34,7 +34,7 @@ RUN apt-get update && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Add Go to PATH
-ENV PATH="/usr/local/go/bin:${PATH}"
+ENV PATH="/usr/local/go/bin:/home/vscode/go/bin:${PATH}"
 
 # Create vscode user for VSCode Remote Containers
 RUN useradd -ms /usr/bin/zsh vscode && usermod -aG sudo vscode
@@ -42,3 +42,5 @@ RUN useradd -ms /usr/bin/zsh vscode && usermod -aG sudo vscode
 # Set working directory and default user
 WORKDIR /workspace
 USER vscode
+
+RUN /usr/local/go/bin/go install github.com/swaggo/swag/cmd/swag@latest

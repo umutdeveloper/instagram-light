@@ -17,6 +17,7 @@ docs/ModelsPost.md
 docs/ModelsPostWithLikes.md
 docs/ModelsPostsResponse.md
 docs/ModelsRegisterResponse.md
+docs/ModelsToggleLikeResponse.md
 docs/ModelsUploadResponse.md
 docs/ModelsUser.md
 docs/PostsApi.md
@@ -32,6 +33,7 @@ models/ModelsPost.ts
 models/ModelsPostWithLikes.ts
 models/ModelsPostsResponse.ts
 models/ModelsRegisterResponse.ts
+models/ModelsToggleLikeResponse.ts
 models/ModelsUploadResponse.ts
 models/ModelsUser.ts
 models/index.ts

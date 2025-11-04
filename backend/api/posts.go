@@ -16,6 +16,7 @@ func RegisterPostRoutes(app *fiber.App) {
 	posts.Post("/", CreatePost)
 	posts.Get(":id", GetPostByID)
 	posts.Delete(":id", DeletePostByID)
+	posts.Post(":id/like", ToggleLike)
 }
 
 // GetPosts handles GET /api/posts
@@ -125,4 +126,50 @@ func DeletePostByID(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to delete post"})
 	}
 	return c.SendStatus(fiber.StatusNoContent)
+}
+
+// ToggleLike handles POST /api/posts/:id/like
+// @Summary Toggle like for a post
+// @Description Like or unlike a post for the authenticated user
+// @Tags posts
+// @Produce json
+// @Param id path int true "Post ID"
+// @Success 200 {object} models.ToggleLikeResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Security BearerAuth
+// @Router /api/posts/{id}/like [post]
+func ToggleLike(c *fiber.Ctx) error {
+	idParam := c.Params("id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid post ID"})
+	}
+	userIDVal := c.Locals("user_id")
+	userID, ok := userIDVal.(int64)
+	if !ok || userID == 0 {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
+	}
+	// Check if post exists
+	var post models.Post
+	if err := db.DB.First(&post, id).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Post not found"})
+	}
+	// Check if like exists
+	var like models.Like
+	result := db.DB.Where("user_id = ? AND post_id = ?", userID, id).First(&like)
+	if result.Error == nil {
+		// Like exists, so unlike (delete)
+		if err := db.DB.Delete(&like).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to unlike post"})
+		}
+		return c.JSON(models.ToggleLikeResponse{Liked: false})
+	}
+	// Like does not exist, so like (create)
+	newLike := models.Like{UserID: uint(userID), PostID: uint(id)}
+	if err := db.DB.Create(&newLike).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to like post"})
+	}
+	return c.JSON(models.ToggleLikeResponse{Liked: true})
 }

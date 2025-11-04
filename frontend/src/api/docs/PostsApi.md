@@ -7,6 +7,7 @@ All URIs are relative to *http://localhost:8080*
 | [**apiPostsGet**](PostsApi.md#apipostsget) | **GET** /api/posts | List posts |
 | [**apiPostsIdDelete**](PostsApi.md#apipostsiddelete) | **DELETE** /api/posts/{id} | Delete post by ID |
 | [**apiPostsIdGet**](PostsApi.md#apipostsidget) | **GET** /api/posts/{id} | Get post by ID |
+| [**apiPostsIdLikePost**](PostsApi.md#apipostsidlikepost) | **POST** /api/posts/{id}/like | Toggle like for a post |
 | [**apiPostsPost**](PostsApi.md#apipostspost) | **POST** /api/posts | Create a post |
 
 
@@ -228,6 +229,80 @@ example().catch(console.error);
 | **200** | OK |  -  |
 | **400** | Bad Request |  -  |
 | **404** | Not Found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## apiPostsIdLikePost
+
+> ModelsToggleLikeResponse apiPostsIdLikePost(id)
+
+Toggle like for a post
+
+Like or unlike a post for the authenticated user
+
+### Example
+
+```ts
+import {
+  Configuration,
+  PostsApi,
+} from '';
+import type { ApiPostsIdLikePostRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure API key authorization: BearerAuth
+    apiKey: "YOUR API KEY",
+  });
+  const api = new PostsApi(config);
+
+  const body = {
+    // number | Post ID
+    id: 56,
+  } satisfies ApiPostsIdLikePostRequest;
+
+  try {
+    const data = await api.apiPostsIdLikePost(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | Post ID | [Defaults to `undefined`] |
+
+### Return type
+
+[**ModelsToggleLikeResponse**](ModelsToggleLikeResponse.md)
+
+### Authorization
+
+[BearerAuth](../README.md#BearerAuth)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **400** | Bad Request |  -  |
+| **404** | Not Found |  -  |
+| **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

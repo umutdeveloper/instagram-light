@@ -18,10 +18,41 @@ import (
 
 func setupPostApp() *fiber.App {
 	db.DB, _ = gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
-	db.DB.AutoMigrate(&models.Post{})
+	db.DB.AutoMigrate(&models.Post{}, &models.Like{})
 	app := fiber.New()
 	api.RegisterPostRoutes(app)
 	return app
+}
+func TestToggleLike(t *testing.T) {
+	app := setupPostApp()
+	// Create a post
+	post := models.Post{UserID: 1, Caption: "Like Me", MediaURL: "http://media.com/like.jpg"}
+	db.DB.Create(&post)
+	token := helpers.GenerateJWT(2, "user2")
+
+	// Like the post
+	reqLike := httptest.NewRequest("POST", "/api/posts/1/like", nil)
+	reqLike.Header.Set("Authorization", "Bearer "+token)
+	respLike, _ := app.Test(reqLike)
+	assert.Equal(t, 200, respLike.StatusCode)
+	var likeResp map[string]bool
+	json.NewDecoder(respLike.Body).Decode(&likeResp)
+	assert.Equal(t, true, likeResp["liked"])
+
+	// Like again (should unlike)
+	reqUnlike := httptest.NewRequest("POST", "/api/posts/1/like", nil)
+	reqUnlike.Header.Set("Authorization", "Bearer "+token)
+	respUnlike, _ := app.Test(reqUnlike)
+	assert.Equal(t, 200, respUnlike.StatusCode)
+	var unlikeResp map[string]bool
+	json.NewDecoder(respUnlike.Body).Decode(&unlikeResp)
+	assert.Equal(t, false, unlikeResp["liked"])
+
+	// Like a non-existent post
+	reqNF := httptest.NewRequest("POST", "/api/posts/999/like", nil)
+	reqNF.Header.Set("Authorization", "Bearer "+token)
+	respNF, _ := app.Test(reqNF)
+	assert.Equal(t, 404, respNF.StatusCode)
 }
 
 func TestCreateAndGetPost(t *testing.T) {

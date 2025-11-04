@@ -4,6 +4,11 @@ import (
 	"time"
 )
 
+// ToggleLikeResponse represents the response for the like toggle API
+type ToggleLikeResponse struct {
+	Liked bool `json:"liked"`
+}
+
 type Post struct {
 	ID        uint      `gorm:"primaryKey"`
 	UserID    uint      `gorm:"not null;index"`

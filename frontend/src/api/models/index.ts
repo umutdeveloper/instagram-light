@@ -9,5 +9,6 @@ export * from './ModelsPost';
 export * from './ModelsPostWithLikes';
 export * from './ModelsPostsResponse';
 export * from './ModelsRegisterResponse';
+export * from './ModelsToggleLikeResponse';
 export * from './ModelsUploadResponse';
 export * from './ModelsUser';

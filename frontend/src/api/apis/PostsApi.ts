@@ -18,6 +18,7 @@ import type {
   ModelsErrorResponse,
   ModelsPost,
   ModelsPostsResponse,
+  ModelsToggleLikeResponse,
 } from '../models/index';
 import {
     ModelsErrorResponseFromJSON,
@@ -26,6 +27,8 @@ import {
     ModelsPostToJSON,
     ModelsPostsResponseFromJSON,
     ModelsPostsResponseToJSON,
+    ModelsToggleLikeResponseFromJSON,
+    ModelsToggleLikeResponseToJSON,
 } from '../models/index';
 
 export interface ApiPostsGetRequest {
@@ -38,6 +41,10 @@ export interface ApiPostsIdDeleteRequest {
 }
 
 export interface ApiPostsIdGetRequest {
+    id: number;
+}
+
+export interface ApiPostsIdLikePostRequest {
     id: number;
 }
 
@@ -180,6 +187,49 @@ export class PostsApi extends runtime.BaseAPI {
      */
     async apiPostsIdGet(requestParameters: ApiPostsIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ModelsPost> {
         const response = await this.apiPostsIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Like or unlike a post for the authenticated user
+     * Toggle like for a post
+     */
+    async apiPostsIdLikePostRaw(requestParameters: ApiPostsIdLikePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ModelsToggleLikeResponse>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling apiPostsIdLikePost().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // BearerAuth authentication
+        }
+
+
+        let urlPath = `/api/posts/{id}/like`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ModelsToggleLikeResponseFromJSON(jsonValue));
+    }
+
+    /**
+     * Like or unlike a post for the authenticated user
+     * Toggle like for a post
+     */
+    async apiPostsIdLikePost(requestParameters: ApiPostsIdLikePostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ModelsToggleLikeResponse> {
+        const response = await this.apiPostsIdLikePostRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
