@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/umutdeveloper/instagram-light/backend/db"
+	"github.com/umutdeveloper/instagram-light/backend/models"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -18,17 +19,24 @@ type User struct {
 	Password string `json:"password"`
 }
 
+// RegisterAuthRoutes registers authentication routes
 func RegisterAuthRoutes(app *fiber.App) {
 	app.Post("/api/auth/register", register)
 	app.Post("/api/auth/login", login)
 }
 
+// @Summary Register a new user
+// @Description Register a new user with username and password
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param body body models.AuthRequest true "User credentials"
+// @Success 200 {object} models.RegisterResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /api/auth/register [post]
 func register(c *fiber.Ctx) error {
-	type reqBody struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}
-	var body reqBody
+	var body models.AuthRequest
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request"})
 	}
@@ -40,15 +48,22 @@ func register(c *fiber.Ctx) error {
 	if err := db.DB.Create(&user).Error; err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Username already exists"})
 	}
-	return c.JSON(fiber.Map{"message": "User registered successfully"})
+	return c.JSON(models.RegisterResponse{Message: "User registered successfully"})
 }
 
+// @Summary Login
+// @Description Login with username and password to get a JWT token
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param body body models.AuthRequest true "User credentials"
+// @Success 200 {object} models.LoginResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 401 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /api/auth/login [post]
 func login(c *fiber.Ctx) error {
-	type reqBody struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-	}
-	var body reqBody
+	var body models.AuthRequest
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request"})
 	}
@@ -74,5 +89,5 @@ func login(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to generate token"})
 	}
-	return c.JSON(fiber.Map{"token": signed})
+	return c.JSON(models.LoginResponse{Token: signed})
 }

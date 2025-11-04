@@ -2,7 +2,6 @@ package api
 
 import (
 	"strconv"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/umutdeveloper/instagram-light/backend/db"
@@ -15,6 +14,17 @@ func RegisterFeedRoutes(app *fiber.App) {
 }
 
 // GetFeed handles GET /api/feed
+// @Summary Get user feed
+// @Description Get a paginated feed for a user (posts from followed users)
+// @Tags feed
+// @Produce json
+// @Param user_id query int true "User ID"
+// @Param page query int false "Page number"
+// @Param limit query int false "Page size"
+// @Success 200 {object} models.FeedResponse
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /api/feed [get]
 func GetFeed(c *fiber.Ctx) error {
 	userIDParam := c.Query("user_id")
 	if userIDParam == "" {
@@ -38,16 +48,7 @@ func GetFeed(c *fiber.Ctx) error {
 	}
 	offset := (page - 1) * limit
 
-	type PostWithLikes struct {
-		ID         uint      `json:"id"`
-		UserID     uint      `json:"user_id"`
-		Caption    string    `json:"caption"`
-		MediaURL   string    `json:"media_url"`
-		CreatedAt  time.Time `json:"created_at"`
-		LikesCount int       `json:"likes_count"`
-	}
-
-	var posts []PostWithLikes
+	var posts []models.PostWithLikes
 
 	// Get followed user IDs
 	var followedIDs []uint
@@ -64,7 +65,7 @@ func GetFeed(c *fiber.Ctx) error {
 	for _, post := range dbPosts {
 		var likesCount int64
 		db.DB.Model(&models.Like{}).Where("post_id = ?", post.ID).Count(&likesCount)
-		posts = append(posts, PostWithLikes{
+		posts = append(posts, models.PostWithLikes{
 			ID:         post.ID,
 			UserID:     post.UserID,
 			Caption:    post.Caption,
@@ -74,9 +75,9 @@ func GetFeed(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(fiber.Map{
-		"page":  page,
-		"limit": limit,
-		"posts": posts,
+	return c.JSON(models.FeedResponse{
+		Page:  page,
+		Limit: limit,
+		Posts: posts,
 	})
 }

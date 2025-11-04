@@ -17,6 +17,15 @@ func RegisterPostRoutes(app *fiber.App) {
 }
 
 // GetPosts handles GET /api/posts
+// @Summary List posts
+// @Description Get a paginated list of posts
+// @Tags posts
+// @Produce json
+// @Param page query int false "Page number"
+// @Param limit query int false "Page size"
+// @Success 200 {object} models.PostsResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /api/posts [get]
 func GetPosts(c *fiber.Ctx) error {
 	// Pagination
 	pageParam := c.Query("page", "1")
@@ -36,14 +45,24 @@ func GetPosts(c *fiber.Ctx) error {
 	if err := tx.Find(&posts).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch posts"})
 	}
-	return c.JSON(fiber.Map{
-		"page":  page,
-		"limit": limit,
-		"posts": posts,
+	return c.JSON(models.PostsResponse{
+		Page:  page,
+		Limit: limit,
+		Posts: posts,
 	})
 }
 
 // CreatePost handles POST /api/posts
+// @Summary Create a post
+// @Description Create a new post
+// @Tags posts
+// @Accept json
+// @Produce json
+// @Param post body models.Post true "Post data"
+// @Success 201 {object} models.Post
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /api/posts [post]
 func CreatePost(c *fiber.Ctx) error {
 	var post models.Post
 	if err := c.BodyParser(&post); err != nil {
@@ -59,6 +78,15 @@ func CreatePost(c *fiber.Ctx) error {
 }
 
 // GetPostByID handles GET /api/posts/:id
+// @Summary Get post by ID
+// @Description Get a single post by its ID
+// @Tags posts
+// @Produce json
+// @Param id path int true "Post ID"
+// @Success 200 {object} models.Post
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Router /api/posts/{id} [get]
 func GetPostByID(c *fiber.Ctx) error {
 	idParam := c.Params("id")
 	id, err := strconv.Atoi(idParam)
@@ -73,6 +101,14 @@ func GetPostByID(c *fiber.Ctx) error {
 }
 
 // DeletePostByID handles DELETE /api/posts/:id
+// @Summary Delete post by ID
+// @Description Delete a post by its ID
+// @Tags posts
+// @Param id path int true "Post ID"
+// @Success 204 {string} string "No Content"
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /api/posts/{id} [delete]
 func DeletePostByID(c *fiber.Ctx) error {
 	idParam := c.Params("id")
 	id, err := strconv.Atoi(idParam)

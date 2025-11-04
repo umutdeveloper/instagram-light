@@ -16,6 +16,15 @@ func RegisterUserRoutes(app *fiber.App) {
 }
 
 // GetFollowers handles GET /api/users/:id/followers
+// @Summary Get followers
+// @Description Get a list of followers for a user
+// @Tags users
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {array} models.User
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /api/users/{id}/followers [get]
 func GetFollowers(c *fiber.Ctx) error {
 	idParam := c.Params("id")
 	id, err := strconv.Atoi(idParam)
@@ -42,6 +51,15 @@ func GetFollowers(c *fiber.Ctx) error {
 }
 
 // GetFollowing handles GET /api/users/:id/following
+// @Summary Get following
+// @Description Get a list of users this user is following
+// @Tags users
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {array} models.User
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /api/users/{id}/following [get]
 func GetFollowing(c *fiber.Ctx) error {
 	idParam := c.Params("id")
 	id, err := strconv.Atoi(idParam)
@@ -68,6 +86,15 @@ func GetFollowing(c *fiber.Ctx) error {
 }
 
 // GetUserByID handles GET /api/users/:id
+// @Summary Get user by ID
+// @Description Get a user by their ID
+// @Tags users
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {object} models.User
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 404 {object} models.ErrorResponse
+// @Router /api/users/{id} [get]
 func GetUserByID(c *fiber.Ctx) error {
 	idParam := c.Params("id")
 	id, err := strconv.Atoi(idParam)
