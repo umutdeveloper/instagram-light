@@ -29,7 +29,17 @@ func JWTMiddleware() fiber.Handler {
 		if err != nil || !token.Valid {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid or expired token"})
 		}
-		c.Locals("user", token.Claims)
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid token claims"})
+		}
+		// Set user_id and username in context
+		if sub, ok := claims["sub"].(float64); ok {
+			c.Locals("user_id", int64(sub))
+		}
+		if username, ok := claims["username"].(string); ok {
+			c.Locals("username", username)
+		}
 		return c.Next()
 	}
 }

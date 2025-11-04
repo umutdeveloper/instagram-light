@@ -29,6 +29,7 @@ func InitDB() {
 		&models.Post{},
 		&models.Like{},
 		&models.Follow{},
+		&models.Comment{},
 	); err != nil {
 		log.Fatalf("Failed to migrate models: %v", err)
 	}

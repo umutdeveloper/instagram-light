@@ -12,6 +12,7 @@ func RegisterRoutes(app *fiber.App) {
 	RegisterAuthRoutes(app)
 	RegisterUserRoutes(app)
 	RegisterPostRoutes(app)
+	RegisterCommentRoutes(app)
 	RegisterFeedRoutes(app)
 	registerUploadRoutes(app)
 }

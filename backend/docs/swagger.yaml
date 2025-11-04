@@ -7,6 +7,19 @@ definitions:
       username:
         type: string
     type: object
+  models.Comment:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: integer
+      post_id:
+        type: integer
+      text:
+        type: string
+      user_id:
+        type: integer
+    type: object
   models.ErrorResponse:
     properties:
       error:
@@ -314,6 +327,119 @@ paths:
       summary: Get post by ID
       tags:
       - posts
+  /api/posts/{post_id}/comments:
+    get:
+      description: Get all comments for a specific post
+      parameters:
+      - description: Post ID
+        in: path
+        name: post_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Comment'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get comments for a post
+      tags:
+      - comments
+    post:
+      consumes:
+      - application/json
+      description: Create a new comment for a specific post
+      parameters:
+      - description: Post ID
+        in: path
+        name: post_id
+        required: true
+        type: integer
+      - description: Comment body (text only)
+        in: body
+        name: body
+        required: true
+        schema:
+          type: object
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Comment'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Create a comment for a post
+      tags:
+      - comments
+  /api/posts/{post_id}/comments/{comment_id}:
+    delete:
+      description: Delete a comment by its ID (only by the comment owner)
+      parameters:
+      - description: Post ID
+        in: path
+        name: post_id
+        required: true
+        type: integer
+      - description: Comment ID
+        in: path
+        name: comment_id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete a comment
+      tags:
+      - comments
   /api/upload:
     post:
       consumes:
