@@ -6,7 +6,15 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install dependencies
 RUN apt-get update && \
-    apt-get install -y git curl build-essential ca-certificates bash && \
+    apt-get install -y git curl build-essential ca-certificates bash software-properties-common && \
+    \
+    # Add deadsnakes PPA and install Python 3.10
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get update && \
+    apt-get install -y python3.10 python3.10-venv python3.10-distutils && \
+    curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10 && \
+    ln -sf /usr/bin/python3.10 /usr/local/bin/python3 && \
+    ln -sf /usr/local/bin/pip3.10 /usr/local/bin/pip3 && \
     \
     # Install OpenJDK 17 for openapi-generator and Java tools
     apt-get install -y openjdk-17-jdk && \
@@ -43,4 +51,11 @@ RUN useradd -ms /usr/bin/zsh vscode && usermod -aG sudo vscode
 WORKDIR /workspace
 USER vscode
 
+# Install Go tools
 RUN /usr/local/go/bin/go install github.com/swaggo/swag/cmd/swag@latest
+
+# Install Python test dependencies for dev container (now using Python 3.10)
+RUN pip3 install pytest pytest-asyncio pytest-cov httpx black flake8 mypy
+
+# Add pip user install path to PATH
+ENV PATH="/home/vscode/.local/bin:${PATH}"
