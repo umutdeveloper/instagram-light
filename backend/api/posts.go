@@ -78,6 +78,15 @@ func CreatePost(c *fiber.Ctx) error {
 	if post.UserID == 0 || post.MediaURL == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "UserID and MediaURL are required"})
 	}
+
+	aiResponse, err := utils.ModerateImage(post.MediaURL)
+	if err != nil {
+		fmt.Printf("AI moderation failed: %v\n", err)
+	} else {
+		post.Flagged = aiResponse.NSFW
+		fmt.Printf("AI moderation result: NSFW=%v, Score=%.3f\n", aiResponse.NSFW, aiResponse.Score)
+	}
+
 	if err := db.DB.Create(&post).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create post"})
 	}

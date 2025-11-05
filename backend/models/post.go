@@ -14,5 +14,6 @@ type Post struct {
 	UserID    uint      `gorm:"not null;index"`
 	Caption   string    `gorm:"type:text"`
 	MediaURL  string    `gorm:"not null"`
+	Flagged   bool      `gorm:"default:false"` // NSFW content flag
 	CreatedAt time.Time `gorm:"autoCreateTime"`
 }
