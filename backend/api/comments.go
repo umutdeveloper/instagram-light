@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/umutdeveloper/instagram-light/backend/db"
 	"github.com/umutdeveloper/instagram-light/backend/middleware"
 	"github.com/umutdeveloper/instagram-light/backend/models"
+	"github.com/umutdeveloper/instagram-light/backend/utils"
 )
 
 // RegisterCommentRoutes registers comment-related routes under posts
@@ -100,6 +102,18 @@ func CreateComment(c *fiber.Ctx) error {
 	if err := db.DB.Create(comment).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to create comment"})
 	}
+
+	var postOwner models.Post
+	if err := db.DB.First(&postOwner, postID).Error; err == nil {
+		wsEvent := models.WSEvent{
+			Type:    "new_comment",
+			Payload: comment,
+		}
+		go func(userID uint, event models.WSEvent) {
+			_ = utils.WSManagerInstance.SendToUser(fmt.Sprintf("%d", userID), event)
+		}(postOwner.UserID, wsEvent)
+	}
+
 	return c.Status(fiber.StatusCreated).JSON(comment)
 }
 

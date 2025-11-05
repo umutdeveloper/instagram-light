@@ -12,21 +12,17 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
+	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-
-	"github.com/gofiber/fiber/v2"
+	fiberSwagger "github.com/swaggo/fiber-swagger"
 	"github.com/umutdeveloper/instagram-light/backend/api"
 	"github.com/umutdeveloper/instagram-light/backend/db"
-	"github.com/umutdeveloper/instagram-light/backend/utils"
-
-	fiberSwagger "github.com/swaggo/fiber-swagger"
-
 	_ "github.com/umutdeveloper/instagram-light/backend/docs"
+	"github.com/umutdeveloper/instagram-light/backend/utils"
 )
 
 func main() {
@@ -40,7 +36,6 @@ func main() {
 		Prefork: true,
 	})
 
-	// Middleware
 	app.Use(logger.New())
 	app.Use(recover.New())
 	app.Use(cors.New(cors.Config{
@@ -49,13 +44,14 @@ func main() {
 	}))
 
 	api.RegisterRoutes(app)
+	api.RegisterWebSocketRoutes(app) // WebSocket now integrated with Fiber
 
-	// Swagger UI endpoint
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 
+	// Start Fiber API server with WebSocket support and Prefork enabled
 	port := utils.GetEnv("PORT", "8080")
-	log.Printf("Server running on port %s", port)
-	if err := app.Listen(fmt.Sprintf(":%s", port)); err != nil {
-		log.Fatalf("Error starting server: %v", err)
+	log.Printf("Fiber API (with WebSocket at /ws) starting on port %s with Prefork enabled", port)
+	if err := app.Listen(":" + port); err != nil {
+		log.Fatalf("Error starting Fiber server: %v", err)
 	}
 }

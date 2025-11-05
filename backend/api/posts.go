@@ -1,12 +1,14 @@
 package api
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/umutdeveloper/instagram-light/backend/db"
 	"github.com/umutdeveloper/instagram-light/backend/middleware"
 	"github.com/umutdeveloper/instagram-light/backend/models"
+	"github.com/umutdeveloper/instagram-light/backend/utils"
 )
 
 // RegisterPostRoutes registers post-related routes
@@ -171,5 +173,17 @@ func ToggleLike(c *fiber.Ctx) error {
 	if err := db.DB.Create(&newLike).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to like post"})
 	}
+
+	var postOwner models.Post
+	if err := db.DB.First(&postOwner, id).Error; err == nil {
+		wsEvent := models.WSEvent{
+			Type:    "new_like",
+			Payload: newLike,
+		}
+		go func(userID uint, event models.WSEvent) {
+			_ = utils.WSManagerInstance.SendToUser(fmt.Sprintf("%d", userID), event)
+		}(postOwner.UserID, wsEvent)
+	}
+
 	return c.JSON(models.ToggleLikeResponse{Liked: true})
 }
