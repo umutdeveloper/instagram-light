@@ -52,15 +52,15 @@ class TestHealthResponse:
     def test_valid_health_response(self):
         """Test valid health check response"""
         response = HealthResponse(
-            status="healthy", model_loaded=True, model_name="test/model"
+            status="healthy", image_moderation_model_loaded=True, image_moderation_model_name="test/model"
         )
         assert response.status == "healthy"
-        assert response.model_loaded is True
-        assert response.model_name == "test/model"
+        assert response.image_moderation_model_loaded is True
+        assert response.image_moderation_model_name == "test/model"
 
     def test_model_not_loaded(self):
         """Test health response when model not loaded"""
         response = HealthResponse(
-            status="starting", model_loaded=False, model_name="test/model"
+            status="starting", image_moderation_model_loaded=False, image_moderation_model_name="test/model"
         )
-        assert response.model_loaded is False
+        assert response.image_moderation_model_loaded is False

@@ -18,11 +18,11 @@ class TestHealthAPI:
                 data = response.json()
 
                 assert "status" in data
-                assert "model_loaded" in data
-                assert "model_name" in data
+                assert "image_moderation_model_loaded" in data
+                assert "image_moderation_model_name" in data
                 assert data["status"] == "healthy"
-                assert data["model_loaded"] is True
-                assert data["model_name"] == "test/model"
+                assert data["image_moderation_model_loaded"] is True
+                assert data["image_moderation_model_name"] == "test/model"
 
     def test_health_status_model_not_loaded(self, client):
         """Test status when model is not loaded"""
@@ -35,7 +35,7 @@ class TestHealthAPI:
 
                 assert response.status_code == 200
                 data = response.json()
-                assert data["model_loaded"] is False
+                assert data["image_moderation_model_loaded"] is False
 
     def test_health_status_response_schema(self, client):
         """Test that response matches HealthResponse schema"""
@@ -52,11 +52,11 @@ class TestHealthAPI:
                 data = response.json()
 
                 # Verify all required fields
-                required_fields = ["status", "model_loaded", "model_name"]
+                required_fields = ["status", "image_moderation_model_loaded", "image_moderation_model_name"]
                 for field in required_fields:
                     assert field in data
 
                 # Verify types
                 assert isinstance(data["status"], str)
-                assert isinstance(data["model_loaded"], bool)
-                assert isinstance(data["model_name"], str)
+                assert isinstance(data["image_moderation_model_loaded"], bool)
+                assert isinstance(data["image_moderation_model_name"], str)
