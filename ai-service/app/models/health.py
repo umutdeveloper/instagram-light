@@ -3,5 +3,5 @@ from pydantic import BaseModel
 
 class HealthResponse(BaseModel):
     status: str
-    model_loaded: bool
-    model_name: str
+    image_moderation_model_loaded: bool
+    image_moderation_model_name: str

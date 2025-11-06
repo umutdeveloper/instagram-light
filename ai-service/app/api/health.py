@@ -10,6 +10,6 @@ router = APIRouter()
 async def health_check():
     return HealthResponse(
         status="healthy",
-        model_loaded=nsfw_model_service.is_loaded,
-        model_name=settings.IMAGE_MODERATION_MODEL_NAME,
+        image_moderation_model_loaded=nsfw_model_service.is_loaded,
+        image_moderation_model_name=settings.IMAGE_MODERATION_MODEL_NAME,
     )
