@@ -1,46 +1,146 @@
 'use client';
 
 import { useAuth } from '@/src/hooks/use-auth';
+import { useFeed } from '@/src/hooks/use-feed';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PostCard } from '@/src/components/feed/post-card';
+import { Loader2, RefreshCw } from 'lucide-react';
 
 export default function FeedPage() {
   const { user, logout } = useAuth();
+  const {
+    posts,
+    isLoading,
+    error,
+    hasMore,
+    observerTarget,
+    toggleLike,
+    refresh,
+    likedPosts,
+  } = useFeed({ limit: 10 });
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6 pb-8">
+      {/* Welcome Card */}
       <Card>
         <CardHeader>
-          <CardTitle>Welcome to Your Feed! 🎉</CardTitle>
-          <CardDescription>
-            You are successfully logged in as <strong>{user?.username}</strong>
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
-            This is a protected page. Only authenticated users can see this content.
-          </p>
-          <div className="flex gap-4">
-            <Button variant="outline">View Profile</Button>
-            <Button variant="outline">Upload Post</Button>
-            <Button variant="destructive" onClick={logout}>
-              Logout
-            </Button>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Welcome, {user?.username}! 🎉</CardTitle>
+              <CardDescription>
+                Your personalized feed from people you follow
+              </CardDescription>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={refresh}
+                disabled={isLoading}
+              >
+                <RefreshCw className={isLoading ? 'animate-spin' : ''} />
+              </Button>
+              <Button variant="destructive" onClick={logout} size="sm">
+                Logout
+              </Button>
+            </div>
           </div>
-        </CardContent>
+        </CardHeader>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Feed Posts</CardTitle>
-          <CardDescription>Posts from people you follow will appear here</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-center text-muted-foreground py-8">
-            No posts yet. Start following people to see their posts!
-          </p>
-        </CardContent>
-      </Card>
+      {/* Error State */}
+      {error && (
+        <Card className="border-destructive">
+          <CardContent className="pt-6">
+            <p className="text-center text-destructive">
+              {error}
+            </p>
+            <div className="flex justify-center mt-4">
+              <Button onClick={refresh} variant="outline">
+                Try Again
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Posts Feed */}
+      {!error && (
+        <div className="space-y-6">
+          {posts.length === 0 && !isLoading ? (
+            <Card>
+              <CardContent className="py-12">
+                <div className="text-center space-y-4">
+                  <p className="text-muted-foreground text-lg">
+                    No posts yet in your feed
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Start following people to see their posts here!
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              {posts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  onLike={toggleLike}
+                  isLiked={post.id ? likedPosts.has(post.id) : false}
+                />
+              ))}
+
+              {/* Infinite Scroll Trigger */}
+              {hasMore && (
+                <div
+                  ref={observerTarget}
+                  className="flex justify-center py-8"
+                >
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                </div>
+              )}
+
+              {/* End of Feed */}
+              {!hasMore && posts.length > 0 && (
+                <Card>
+                  <CardContent className="py-6">
+                    <p className="text-center text-muted-foreground text-sm">
+                      You&apos;re all caught up! 🎉
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Initial Loading State */}
+      {isLoading && posts.length === 0 && (
+        <div className="space-y-6">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="overflow-hidden">
+              <div className="animate-pulse">
+                <div className="flex items-center gap-3 p-4">
+                  <div className="h-10 w-10 rounded-full bg-muted" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 w-24 bg-muted rounded" />
+                    <div className="h-3 w-16 bg-muted rounded" />
+                  </div>
+                </div>
+                <div className="w-full aspect-square bg-muted" />
+                <div className="p-4 space-y-3">
+                  <div className="h-4 w-16 bg-muted rounded" />
+                  <div className="h-4 w-full bg-muted rounded" />
+                  <div className="h-4 w-3/4 bg-muted rounded" />
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

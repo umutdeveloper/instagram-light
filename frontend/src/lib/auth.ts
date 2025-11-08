@@ -2,6 +2,7 @@ import { jwtDecode } from 'jwt-decode';
 
 interface JWTPayload {
   username?: string;
+  sub?: number;
   exp?: number;
   iat?: number;
   [key: string]: string | number | undefined;
@@ -50,4 +51,12 @@ export function isTokenValid(token: string | null): boolean {
 export function getUsernameFromToken(token: string): string | null {
   const decoded = decodeToken(token);
   return decoded?.username || null;
+}
+
+/**
+ * Extract user ID from token
+ */
+export function getUserIdFromToken(token: string): number | null {
+  const decoded = decodeToken(token);
+  return decoded?.sub ? Number(decoded.sub) : null;
 }
