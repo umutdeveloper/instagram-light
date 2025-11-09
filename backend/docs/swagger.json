@@ -842,16 +842,19 @@
                 "caption": {
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
+                },
+                "flagged": {
+                    "type": "boolean"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "mediaURL": {
+                "media_url": {
                     "type": "string"
                 },
-                "userID": {
+                "user_id": {
                     "type": "integer"
                 }
             }
@@ -865,8 +868,14 @@
                 "created_at": {
                     "type": "string"
                 },
+                "flagged": {
+                    "type": "boolean"
+                },
                 "id": {
                     "type": "integer"
+                },
+                "is_liked": {
+                    "type": "boolean"
                 },
                 "likes_count": {
                     "type": "integer"
@@ -876,6 +885,9 @@
                 },
                 "user_id": {
                     "type": "integer"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },

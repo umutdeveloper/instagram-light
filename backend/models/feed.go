@@ -7,10 +7,13 @@ import "time"
 type PostWithLikes struct {
 	ID         uint      `json:"id"`
 	UserID     uint      `json:"user_id"`
+	Username   string    `json:"username"`
 	Caption    string    `json:"caption"`
 	MediaURL   string    `json:"media_url"`
+	Flagged    bool      `json:"flagged"`
 	CreatedAt  time.Time `json:"created_at"`
 	LikesCount int       `json:"likes_count"`
+	IsLiked    bool      `json:"is_liked"`
 }
 
 // FeedResponse represents the paginated feed response

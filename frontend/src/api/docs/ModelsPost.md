@@ -8,9 +8,10 @@ Name | Type
 ------------ | -------------
 `caption` | string
 `createdAt` | string
+`flagged` | boolean
 `id` | number
-`mediaURL` | string
-`userID` | number
+`mediaUrl` | string
+`userId` | number
 
 ## Example
 
@@ -21,9 +22,10 @@ import type { ModelsPost } from ''
 const example = {
   "caption": null,
   "createdAt": null,
+  "flagged": null,
   "id": null,
-  "mediaURL": null,
-  "userID": null,
+  "mediaUrl": null,
+  "userId": null,
 } satisfies ModelsPost
 
 console.log(example)

@@ -8,10 +8,13 @@ Name | Type
 ------------ | -------------
 `caption` | string
 `createdAt` | string
+`flagged` | boolean
 `id` | number
+`isLiked` | boolean
 `likesCount` | number
 `mediaUrl` | string
 `userId` | number
+`username` | string
 
 ## Example
 
@@ -22,10 +25,13 @@ import type { ModelsPostWithLikes } from ''
 const example = {
   "caption": null,
   "createdAt": null,
+  "flagged": null,
   "id": null,
+  "isLiked": null,
   "likesCount": null,
   "mediaUrl": null,
   "userId": null,
+  "username": null,
 } satisfies ModelsPostWithLikes
 
 console.log(example)

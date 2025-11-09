@@ -1,14 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import { useAuth } from '@/src/hooks/use-auth';
 import { useFeed } from '@/src/hooks/use-feed';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { PostCard } from '@/src/components/feed/post-card';
-import { Loader2, RefreshCw } from 'lucide-react';
+import { UploadDialog } from '@/src/components/upload/upload-dialog';
+import { Loader2, RefreshCw, Plus } from 'lucide-react';
 
 export default function FeedPage() {
   const { user, logout } = useAuth();
+  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const {
     posts,
     isLoading,
@@ -17,7 +20,6 @@ export default function FeedPage() {
     observerTarget,
     toggleLike,
     refresh,
-    likedPosts,
   } = useFeed({ limit: 10 });
 
   return (
@@ -32,22 +34,38 @@ export default function FeedPage() {
                 Your personalized feed from people you follow
               </CardDescription>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
               <Button
                 variant="outline"
                 size="icon"
                 onClick={refresh}
                 disabled={isLoading}
+                title="Refresh feed"
               >
                 <RefreshCw className={isLoading ? 'animate-spin' : ''} />
               </Button>
-              <Button variant="destructive" onClick={logout} size="sm">
+              <Button
+                variant="default"
+                size="icon"
+                onClick={() => setUploadDialogOpen(true)}
+                title="Create new post"
+              >
+                <Plus className="h-5 w-5" />
+              </Button>
+              <Button variant="destructive" onClick={logout} size="default">
                 Logout
               </Button>
             </div>
           </div>
         </CardHeader>
       </Card>
+
+      {/* Upload Dialog */}
+      <UploadDialog
+        open={uploadDialogOpen}
+        onOpenChange={setUploadDialogOpen}
+        onSuccess={refresh}
+      />
 
       {/* Error State */}
       {error && (
@@ -67,7 +85,7 @@ export default function FeedPage() {
 
       {/* Posts Feed */}
       {!error && (
-        <div className="space-y-6">
+        <div className="space-y-6 max-w-lg mx-auto">
           {posts.length === 0 && !isLoading ? (
             <Card>
               <CardContent className="py-12">
@@ -88,7 +106,6 @@ export default function FeedPage() {
                   key={post.id}
                   post={post}
                   onLike={toggleLike}
-                  isLiked={post.id ? likedPosts.has(post.id) : false}
                 />
               ))}
 

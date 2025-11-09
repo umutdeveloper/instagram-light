@@ -64,17 +64,34 @@ func GetFeed(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to fetch feed posts"})
 	}
 
-	// Get likes count for each post
+	// Get likes count and check if current user liked each post
 	for _, post := range dbPosts {
 		var likesCount int64
 		db.DB.Model(&models.Like{}).Where("post_id = ?", post.ID).Count(&likesCount)
+
+		// Check if current user liked this post
+		var isLiked bool
+		var likeExists int64
+		db.DB.Model(&models.Like{}).Where("post_id = ? AND user_id = ?", post.ID, userID).Count(&likeExists)
+		isLiked = likeExists > 0
+
+		// Get username for this post
+		var user models.User
+		username := ""
+		if err := db.DB.First(&user, post.UserID).Error; err == nil {
+			username = user.Username
+		}
+
 		posts = append(posts, models.PostWithLikes{
 			ID:         post.ID,
 			UserID:     post.UserID,
+			Username:   username,
 			Caption:    post.Caption,
 			MediaURL:   post.MediaURL,
+			Flagged:    post.Flagged,
 			CreatedAt:  post.CreatedAt,
 			LikesCount: int(likesCount),
+			IsLiked:    isLiked,
 		})
 	}
 

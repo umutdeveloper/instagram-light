@@ -848,16 +848,19 @@ const docTemplate = `{
                 "caption": {
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "type": "string"
+                },
+                "flagged": {
+                    "type": "boolean"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "mediaURL": {
+                "media_url": {
                     "type": "string"
                 },
-                "userID": {
+                "user_id": {
                     "type": "integer"
                 }
             }
@@ -871,8 +874,14 @@ const docTemplate = `{
                 "created_at": {
                     "type": "string"
                 },
+                "flagged": {
+                    "type": "boolean"
+                },
                 "id": {
                     "type": "integer"
+                },
+                "is_liked": {
+                    "type": "boolean"
                 },
                 "likes_count": {
                     "type": "integer"
@@ -882,6 +891,9 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "integer"
+                },
+                "username": {
+                    "type": "string"
                 }
             }
         },

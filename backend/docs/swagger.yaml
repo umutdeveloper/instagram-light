@@ -45,13 +45,15 @@ definitions:
     properties:
       caption:
         type: string
-      createdAt:
+      created_at:
         type: string
+      flagged:
+        type: boolean
       id:
         type: integer
-      mediaURL:
+      media_url:
         type: string
-      userID:
+      user_id:
         type: integer
     type: object
   models.PostWithLikes:
@@ -60,14 +62,20 @@ definitions:
         type: string
       created_at:
         type: string
+      flagged:
+        type: boolean
       id:
         type: integer
+      is_liked:
+        type: boolean
       likes_count:
         type: integer
       media_url:
         type: string
       user_id:
         type: integer
+      username:
+        type: string
     type: object
   models.PostsResponse:
     properties:

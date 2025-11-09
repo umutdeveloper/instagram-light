@@ -33,10 +33,22 @@ export interface ModelsPostWithLikes {
     createdAt?: string;
     /**
      * 
+     * @type {boolean}
+     * @memberof ModelsPostWithLikes
+     */
+    flagged?: boolean;
+    /**
+     * 
      * @type {number}
      * @memberof ModelsPostWithLikes
      */
     id?: number;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof ModelsPostWithLikes
+     */
+    isLiked?: boolean;
     /**
      * 
      * @type {number}
@@ -55,6 +67,12 @@ export interface ModelsPostWithLikes {
      * @memberof ModelsPostWithLikes
      */
     userId?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ModelsPostWithLikes
+     */
+    username?: string;
 }
 
 /**
@@ -76,10 +94,13 @@ export function ModelsPostWithLikesFromJSONTyped(json: any, ignoreDiscriminator:
         
         'caption': json['caption'] == null ? undefined : json['caption'],
         'createdAt': json['created_at'] == null ? undefined : json['created_at'],
+        'flagged': json['flagged'] == null ? undefined : json['flagged'],
         'id': json['id'] == null ? undefined : json['id'],
+        'isLiked': json['is_liked'] == null ? undefined : json['is_liked'],
         'likesCount': json['likes_count'] == null ? undefined : json['likes_count'],
         'mediaUrl': json['media_url'] == null ? undefined : json['media_url'],
         'userId': json['user_id'] == null ? undefined : json['user_id'],
+        'username': json['username'] == null ? undefined : json['username'],
     };
 }
 
@@ -96,10 +117,13 @@ export function ModelsPostWithLikesToJSONTyped(value?: ModelsPostWithLikes | nul
         
         'caption': value['caption'],
         'created_at': value['createdAt'],
+        'flagged': value['flagged'],
         'id': value['id'],
+        'is_liked': value['isLiked'],
         'likes_count': value['likesCount'],
         'media_url': value['mediaUrl'],
         'user_id': value['userId'],
+        'username': value['username'],
     };
 }
 

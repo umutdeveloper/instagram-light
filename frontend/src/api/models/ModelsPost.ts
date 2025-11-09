@@ -33,6 +33,12 @@ export interface ModelsPost {
     createdAt?: string;
     /**
      * 
+     * @type {boolean}
+     * @memberof ModelsPost
+     */
+    flagged?: boolean;
+    /**
+     * 
      * @type {number}
      * @memberof ModelsPost
      */
@@ -42,13 +48,13 @@ export interface ModelsPost {
      * @type {string}
      * @memberof ModelsPost
      */
-    mediaURL?: string;
+    mediaUrl?: string;
     /**
      * 
      * @type {number}
      * @memberof ModelsPost
      */
-    userID?: number;
+    userId?: number;
 }
 
 /**
@@ -69,10 +75,11 @@ export function ModelsPostFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     return {
         
         'caption': json['caption'] == null ? undefined : json['caption'],
-        'createdAt': json['createdAt'] == null ? undefined : json['createdAt'],
+        'createdAt': json['created_at'] == null ? undefined : json['created_at'],
+        'flagged': json['flagged'] == null ? undefined : json['flagged'],
         'id': json['id'] == null ? undefined : json['id'],
-        'mediaURL': json['mediaURL'] == null ? undefined : json['mediaURL'],
-        'userID': json['userID'] == null ? undefined : json['userID'],
+        'mediaUrl': json['media_url'] == null ? undefined : json['media_url'],
+        'userId': json['user_id'] == null ? undefined : json['user_id'],
     };
 }
 
@@ -88,10 +95,11 @@ export function ModelsPostToJSONTyped(value?: ModelsPost | null, ignoreDiscrimin
     return {
         
         'caption': value['caption'],
-        'createdAt': value['createdAt'],
+        'created_at': value['createdAt'],
+        'flagged': value['flagged'],
         'id': value['id'],
-        'mediaURL': value['mediaURL'],
-        'userID': value['userID'],
+        'media_url': value['mediaUrl'],
+        'user_id': value['userId'],
     };
 }
 

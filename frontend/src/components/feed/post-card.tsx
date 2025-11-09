@@ -4,20 +4,30 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, MessageCircle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Heart, MessageCircle, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ModelsPostWithLikes } from '@/src/api/models';
 
 interface PostCardProps {
   post: ModelsPostWithLikes;
   onLike: (postId: number) => Promise<void>;
-  isLiked?: boolean;
 }
 
-export function PostCard({ post, onLike, isLiked = false }: PostCardProps) {
+export function PostCard({ post, onLike }: PostCardProps) {
   const [isLiking, setIsLiking] = useState(false);
-  const [localIsLiked, setLocalIsLiked] = useState(isLiked);
+  const [localIsLiked, setLocalIsLiked] = useState(post.isLiked || false);
   const [localLikesCount, setLocalLikesCount] = useState(post.likesCount || 0);
+
+  // Convert relative path to absolute URL
+  const getImageUrl = (mediaUrl?: string) => {
+    if (!mediaUrl) return '';
+    if (mediaUrl.startsWith('http://') || mediaUrl.startsWith('https://')) {
+      return mediaUrl;
+    }
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+    return `${apiBaseUrl}/${mediaUrl}`;
+  };
 
   const handleLike = async () => {
     if (isLiking || !post.id) return;
@@ -41,11 +51,15 @@ export function PostCard({ post, onLike, isLiked = false }: PostCardProps) {
     }
   };
 
-  // Generate user initials from userId (simple approach)
-  const getUserInitials = (userId?: number) => {
-    if (!userId) return 'U';
-    const str = `User${userId}`;
-    return str.substring(0, 2).toUpperCase();
+  // Generate user initials from username
+  const getUserInitials = (username?: string) => {
+    if (!username) return 'U';
+    return username.substring(0, 2).toUpperCase();
+  };
+
+  // Get display name (username or fallback to User ID)
+  const getDisplayName = () => {
+    return post.username || `User ${post.userId}`;
   };
 
   const formatDate = (dateString?: string) => {
@@ -67,26 +81,49 @@ export function PostCard({ post, onLike, isLiked = false }: PostCardProps) {
       {/* Header */}
       <div className="flex items-center gap-3 p-4">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-br from-purple-500 to-pink-500 text-white font-semibold">
-          {getUserInitials(post.userId)}
+          {getUserInitials(post.username)}
         </div>
         <div className="flex-1">
-          <p className="font-semibold text-sm">User {post.userId}</p>
+          <p className="font-semibold text-sm">{getDisplayName()}</p>
           {post.createdAt && (
             <p className="text-xs text-muted-foreground">{formatDate(post.createdAt)}</p>
           )}
         </div>
       </div>
 
+      {/* Moderation Warning */}
+      {post.flagged && (
+        <div className="px-4 pb-3">
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              This post is under review for content moderation
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
+
       {/* Image */}
       {post.mediaUrl && (
         <div className="relative w-full aspect-square bg-muted">
           <Image
-            src={post.mediaUrl}
+            src={getImageUrl(post.mediaUrl)}
             alt={post.caption || 'Post image'}
             fill
-            className="object-cover"
+            unoptimized
+            className={cn(
+              'object-cover',
+              post.flagged && 'blur-lg'
+            )}
             sizes="(max-width: 768px) 100vw, 600px"
           />
+          {post.flagged && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+              <p className="text-white font-semibold text-center px-4">
+                Content Under Review
+              </p>
+            </div>
+          )}
         </div>
       )}
 
@@ -123,8 +160,8 @@ export function PostCard({ post, onLike, isLiked = false }: PostCardProps) {
       {/* Caption */}
       {post.caption && (
         <div className="px-4 py-2">
-          <p className="text-sm">
-            <span className="font-semibold mr-2">User {post.userId}</span>
+          <p className="text-sm whitespace-pre-wrap wrap-break-word">
+            <span className="font-semibold mr-2">{getDisplayName()}</span>
             {post.caption}
           </p>
         </div>

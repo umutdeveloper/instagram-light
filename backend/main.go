@@ -46,6 +46,9 @@ func main() {
 	api.RegisterRoutes(app)
 	api.RegisterWebSocketRoutes(app) // WebSocket now integrated with Fiber
 
+	// Serve static files from tmp/uploads directory
+	app.Static("/tmp/uploads", "./tmp/uploads")
+
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 
 	// Start Fiber API server with WebSocket support and Prefork enabled

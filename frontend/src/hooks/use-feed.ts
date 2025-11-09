@@ -13,7 +13,7 @@ interface UseFeedOptions {
 export function useFeed({ limit = 10 }: UseFeedOptions = {}) {
   const { token } = useAuthStore();
   const [posts, setPosts] = useState<ModelsPostWithLikes[]>([]);
-  const [page, setPage] = useState(1);
+  const pageRef = useRef(1);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +25,7 @@ export function useFeed({ limit = 10 }: UseFeedOptions = {}) {
   // Fetch feed posts
   const fetchFeed = useCallback(
     async (pageNum: number) => {
-      if (!token || isLoading) return;
+      if (!token) return;
 
       setIsLoading(true);
       setError(null);
@@ -48,8 +48,26 @@ export function useFeed({ limit = 10 }: UseFeedOptions = {}) {
 
         if (pageNum === 1) {
           setPosts(newPosts);
+          // Initialize liked posts from API response
+          const initialLikedPosts = new Set<number>();
+          newPosts.forEach((post) => {
+            if (post.id && post.isLiked) {
+              initialLikedPosts.add(post.id);
+            }
+          });
+          setLikedPosts(initialLikedPosts);
         } else {
           setPosts((prev) => [...prev, ...newPosts]);
+          // Add newly loaded liked posts
+          setLikedPosts((prev) => {
+            const updated = new Set(prev);
+            newPosts.forEach((post) => {
+              if (post.id && post.isLiked) {
+                updated.add(post.id);
+              }
+            });
+            return updated;
+          });
         }
 
         // Check if there are more posts
@@ -61,7 +79,7 @@ export function useFeed({ limit = 10 }: UseFeedOptions = {}) {
         setIsLoading(false);
       }
     },
-    [token, limit, isLoading]
+    [token, limit]
   );
 
   // Toggle like
@@ -107,25 +125,25 @@ export function useFeed({ limit = 10 }: UseFeedOptions = {}) {
 
   // Load more posts
   const loadMore = useCallback(() => {
-    if (!isLoading && hasMore) {
-      const nextPage = page + 1;
-      setPage(nextPage);
-      fetchFeed(nextPage);
-    }
-  }, [page, isLoading, hasMore, fetchFeed]);
+    const nextPage = pageRef.current + 1;
+    pageRef.current = nextPage;
+    fetchFeed(nextPage);
+  }, [fetchFeed]);
 
   // Refresh feed
   const refresh = useCallback(() => {
-    setPage(1);
+    pageRef.current = 1;
     setHasMore(true);
     fetchFeed(1);
   }, [fetchFeed]);
 
   // Initial load
   useEffect(() => {
-    fetchFeed(1);
+    if (token) {
+      fetchFeed(1);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [token]);
 
   // Intersection Observer for infinite scroll
   useEffect(() => {

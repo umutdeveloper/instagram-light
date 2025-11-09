@@ -13,17 +13,9 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
  * Creates an API configuration with optional JWT token
  */
 export function createApiConfig(token?: string | null): Configuration {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-  };
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
   return new Configuration({
     basePath: API_BASE_URL,
-    headers,
+    apiKey: token ? `Bearer ${token}` : undefined,
   });
 }
 

@@ -5,17 +5,30 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/umutdeveloper/instagram-light/backend/models"
 )
 
-// moderateImage calls the AI service to check for NSFW content
+// isAbsoluteURL checks if a URL is absolute (starts with http:// or https://)
+func isAbsoluteURL(url string) bool {
+	return strings.HasPrefix(url, "http://") || strings.HasPrefix(url, "https://")
+}
+
+// ModerateImage calls the AI service to check for NSFW content
 func ModerateImage(mediaURL string) (*models.AIServiceResponse, error) {
 	aiServiceURL := GetEnv("AI_SERVICE_URL", "http://ai-service:8000")
+	backendURL := GetEnv("BACKEND_URL", "http://backend:8080")
+
+	// Convert relative path to absolute URL for AI service
+	imageURL := mediaURL
+	if !isAbsoluteURL(imageURL) {
+		imageURL = backendURL + "/" + mediaURL
+	}
 
 	requestBody := map[string]string{
-		"image_url": mediaURL,
+		"image_url": imageURL,
 	}
 	jsonData, err := json.Marshal(requestBody)
 	if err != nil {
