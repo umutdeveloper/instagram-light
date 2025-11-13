@@ -7,6 +7,7 @@ All URIs are relative to *http://localhost:8080*
 | [**apiUsersIdFollowersGet**](UsersApi.md#apiusersidfollowersget) | **GET** /api/users/{id}/followers | Get followers |
 | [**apiUsersIdFollowingGet**](UsersApi.md#apiusersidfollowingget) | **GET** /api/users/{id}/following | Get following |
 | [**apiUsersIdGet**](UsersApi.md#apiusersidget) | **GET** /api/users/{id} | Get user by ID |
+| [**apiUsersSearchGet**](UsersApi.md#apiuserssearchget) | **GET** /api/users/search | Search users |
 
 
 
@@ -225,6 +226,79 @@ example().catch(console.error);
 | **200** | OK |  -  |
 | **400** | Bad Request |  -  |
 | **404** | Not Found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## apiUsersSearchGet
+
+> Array&lt;ModelsUser&gt; apiUsersSearchGet(q)
+
+Search users
+
+Search for users by username or email
+
+### Example
+
+```ts
+import {
+  Configuration,
+  UsersApi,
+} from '';
+import type { ApiUsersSearchGetRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const config = new Configuration({ 
+    // To configure API key authorization: BearerAuth
+    apiKey: "YOUR API KEY",
+  });
+  const api = new UsersApi(config);
+
+  const body = {
+    // string | Search query
+    q: q_example,
+  } satisfies ApiUsersSearchGetRequest;
+
+  try {
+    const data = await api.apiUsersSearchGet(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **q** | `string` | Search query | [Defaults to `undefined`] |
+
+### Return type
+
+[**Array&lt;ModelsUser&gt;**](ModelsUser.md)
+
+### Authorization
+
+[BearerAuth](../README.md#BearerAuth)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **400** | Bad Request |  -  |
+| **500** | Internal Server Error |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

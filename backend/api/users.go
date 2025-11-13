@@ -12,9 +12,44 @@ import (
 // register user routes
 func RegisterUserRoutes(app *fiber.App) {
 	user := app.Group("/api/users", middleware.JWTMiddleware())
+	user.Get("/search", SearchUsers)
 	user.Get(":id", GetUserByID)
 	user.Get(":id/followers", GetFollowers)
 	user.Get(":id/following", GetFollowing)
+}
+
+// SearchUsers handles GET /api/users/search?q=query
+// @Summary Search users
+// @Description Search for users by username or email
+// @Tags users
+// @Produce json
+// @Param q query string true "Search query"
+// @Success 200 {array} models.User
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Security BearerAuth
+// @Router /api/users/search [get]
+func SearchUsers(c *fiber.Ctx) error {
+	query := c.Query("q")
+	if query == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Search query is required"})
+	}
+
+	var users []models.User
+	searchPattern := "%" + query + "%"
+	err := db.DB.Where("username LIKE ? OR email LIKE ?", searchPattern, searchPattern).
+		Limit(20).
+		Find(&users).Error
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to search users"})
+	}
+
+	// Hide password fields
+	for i := range users {
+		users[i].Password = ""
+	}
+
+	return c.JSON(users)
 }
 
 // GetFollowers handles GET /api/users/:id/followers

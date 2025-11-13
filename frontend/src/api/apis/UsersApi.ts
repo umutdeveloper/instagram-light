@@ -37,6 +37,10 @@ export interface ApiUsersIdGetRequest {
     id: number;
 }
 
+export interface ApiUsersSearchGetRequest {
+    q: string;
+}
+
 /**
  * 
  */
@@ -168,6 +172,52 @@ export class UsersApi extends runtime.BaseAPI {
      */
     async apiUsersIdGet(requestParameters: ApiUsersIdGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ModelsUser> {
         const response = await this.apiUsersIdGetRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Search for users by username or email
+     * Search users
+     */
+    async apiUsersSearchGetRaw(requestParameters: ApiUsersSearchGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ModelsUser>>> {
+        if (requestParameters['q'] == null) {
+            throw new runtime.RequiredError(
+                'q',
+                'Required parameter "q" was null or undefined when calling apiUsersSearchGet().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters['q'] != null) {
+            queryParameters['q'] = requestParameters['q'];
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        if (this.configuration && this.configuration.apiKey) {
+            headerParameters["Authorization"] = await this.configuration.apiKey("Authorization"); // BearerAuth authentication
+        }
+
+
+        let urlPath = `/api/users/search`;
+
+        const response = await this.request({
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ModelsUserFromJSON));
+    }
+
+    /**
+     * Search for users by username or email
+     * Search users
+     */
+    async apiUsersSearchGet(requestParameters: ApiUsersSearchGetRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ModelsUser>> {
+        const response = await this.apiUsersSearchGetRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
