@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,6 +10,8 @@ import { useAuth } from '@/src/hooks/use-auth';
 import Link from 'next/link';
 
 export function LoginForm() {
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get('redirect') || '/feed';
   const { login, isLoading, error } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -24,7 +27,7 @@ export function LoginForm() {
       return;
     }
 
-    await login(username, password);
+    await login(username, password, redirectUrl);
   };
 
   return (

@@ -1,17 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { useAuth } from '@/src/hooks/use-auth';
 import { useFeed } from '@/src/hooks/use-feed';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { PostCard } from '@/src/components/feed/post-card';
-import { UploadDialog } from '@/src/components/upload/upload-dialog';
-import { Loader2, RefreshCw, Plus } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 export default function FeedPage() {
-  const { user, logout } = useAuth();
-  const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
   const {
     posts,
     isLoading,
@@ -19,53 +14,10 @@ export default function FeedPage() {
     hasMore,
     observerTarget,
     toggleLike,
-    refresh,
   } = useFeed({ limit: 10 });
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 pb-8">
-      {/* Welcome Card */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Welcome, {user?.username}! 🎉</CardTitle>
-              <CardDescription>
-                Your personalized feed from people you follow
-              </CardDescription>
-            </div>
-            <div className="flex gap-2 items-center">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={refresh}
-                disabled={isLoading}
-                title="Refresh feed"
-              >
-                <RefreshCw className={isLoading ? 'animate-spin' : ''} />
-              </Button>
-              <Button
-                variant="default"
-                size="icon"
-                onClick={() => setUploadDialogOpen(true)}
-                title="Create new post"
-              >
-                <Plus className="h-5 w-5" />
-              </Button>
-              <Button variant="destructive" onClick={logout} size="default">
-                Logout
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
-
-      {/* Upload Dialog */}
-      <UploadDialog
-        open={uploadDialogOpen}
-        onOpenChange={setUploadDialogOpen}
-        onSuccess={refresh}
-      />
 
       {/* Error State */}
       {error && (

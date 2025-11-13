@@ -2,6 +2,8 @@ basePath: /
 definitions:
   models.AuthRequest:
     properties:
+      email:
+        type: string
       password:
         type: string
       username:

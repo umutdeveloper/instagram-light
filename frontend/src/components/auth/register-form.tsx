@@ -11,6 +11,7 @@ import Link from 'next/link';
 export function RegisterForm() {
   const { register, isLoading, error } = useAuth();
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [validationError, setValidationError] = useState('');
@@ -20,13 +21,20 @@ export function RegisterForm() {
     setValidationError('');
 
     // Validation
-    if (!username.trim() || !password.trim() || !confirmPassword.trim()) {
+    if (!username.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
       setValidationError('Please fill in all fields');
       return;
     }
 
     if (username.length < 3) {
       setValidationError('Username must be at least 3 characters');
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setValidationError('Please enter a valid email address');
       return;
     }
 
@@ -40,7 +48,7 @@ export function RegisterForm() {
       return;
     }
 
-    await register(username, password);
+    await register(username, email, password);
   };
 
   return (
@@ -61,6 +69,18 @@ export function RegisterForm() {
               placeholder="Choose a username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              disabled={isLoading}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="your@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               disabled={isLoading}
               required
             />

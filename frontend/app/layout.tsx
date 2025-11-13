@@ -13,7 +13,24 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const theme = localStorage.getItem('theme');
+                if (theme) {
+                  document.documentElement.className = theme;
+                } else {
+                  const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                  document.documentElement.className = systemTheme;
+                }
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className="font-sans antialiased bg-gray-50 dark:bg-gray-900">
         {children}
       </body>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/src/stores/auth-store";
 import { createApiClients } from "@/src/lib/api-client";
-import { getUsernameFromToken, isTokenValid } from "@/src/lib/auth";
+import { getUsernameFromToken, getUserIdFromToken, isTokenValid } from "@/src/lib/auth";
 import type { ModelsAuthRequest } from "@/src/api/models";
 
 export function useAuth() {
@@ -16,7 +16,7 @@ export function useAuth() {
   /**
    * Login user
    */
-  const login = async (username: string, password: string) => {
+  const login = async (username: string, password: string, redirectTo?: string) => {
     setIsLoading(true);
     setError(null);
 
@@ -33,14 +33,16 @@ export function useAuth() {
         }
 
         const usernameFromToken = getUsernameFromToken(response.token);
+        const userIdFromToken = getUserIdFromToken(response.token);
 
         // Save to store
         setAuth(response.token, {
           username: usernameFromToken || username,
+          id: userIdFromToken || 0,
         });
 
-        // Redirect to feed
-        router.push("/feed");
+        // Redirect to specified path or feed
+        router.push(redirectTo || "/feed");
         return { success: true };
       } else {
         throw new Error("No token received");
@@ -60,13 +62,13 @@ export function useAuth() {
   /**
    * Register new user
    */
-  const register = async (username: string, password: string) => {
+  const register = async (username: string, email: string, password: string) => {
     setIsLoading(true);
     setError(null);
 
     try {
       const apiClient = createApiClients();
-      const body: ModelsAuthRequest = { username, password };
+      const body: ModelsAuthRequest = { username, email, password };
 
       const response = await apiClient.auth.apiAuthRegisterPost({ body });
 

@@ -5,7 +5,7 @@ import type { NextRequest } from 'next/server';
 const protectedRoutes = ['/feed', '/profile', '/upload'];
 
 // Routes that should redirect to feed if already authenticated
-const authRoutes = ['/login', '/register'];
+const authRoutes = ['/login', '/register', '/'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -15,7 +15,11 @@ export function middleware(request: NextRequest) {
 
   // Check if route is protected
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
-  const isAuthRoute = authRoutes.some(route => pathname.startsWith(route));
+  
+  // Check if route is an auth route (exact match only)
+  const isAuthRoute = authRoutes.includes(pathname) || 
+                      pathname === '/login' || 
+                      pathname === '/register';
 
   // Redirect to login if accessing protected route without token
   if (isProtectedRoute && !token) {
@@ -24,6 +28,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
+  console.log('Middleware check for auth routes', isAuthRoute, token);
   // Redirect to feed if accessing auth routes with valid token
   if (isAuthRoute && token) {
     return NextResponse.redirect(new URL('/feed', request.url));

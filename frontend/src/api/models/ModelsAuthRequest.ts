@@ -24,6 +24,12 @@ export interface ModelsAuthRequest {
      * @type {string}
      * @memberof ModelsAuthRequest
      */
+    email?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ModelsAuthRequest
+     */
     password?: string;
     /**
      * 
@@ -50,6 +56,7 @@ export function ModelsAuthRequestFromJSONTyped(json: any, ignoreDiscriminator: b
     }
     return {
         
+        'email': json['email'] == null ? undefined : json['email'],
         'password': json['password'] == null ? undefined : json['password'],
         'username': json['username'] == null ? undefined : json['username'],
     };
@@ -66,6 +73,7 @@ export function ModelsAuthRequestToJSONTyped(value?: ModelsAuthRequest | null, i
 
     return {
         
+        'email': value['email'],
         'password': value['password'],
         'username': value['username'],
     };

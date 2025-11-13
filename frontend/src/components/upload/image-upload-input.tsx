@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import Image from 'next/image';
 import { Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -14,6 +14,7 @@ interface ImageUploadInputProps {
 export function ImageUploadInput({ onChange, disabled }: ImageUploadInputProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback(
     (file: File) => {
@@ -78,11 +79,20 @@ export function ImageUploadInput({ onChange, disabled }: ImageUploadInputProps) 
   const handleRemove = useCallback(() => {
     onChange(null);
     setPreview(null);
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
   }, [onChange]);
+
+  const handleClick = useCallback(() => {
+    if (!disabled && inputRef.current) {
+      inputRef.current.click();
+    }
+  }, [disabled]);
 
   if (preview) {
     return (
-      <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-muted">
+      <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-muted">
         <Image
           src={preview}
           alt="Upload preview"
@@ -107,30 +117,32 @@ export function ImageUploadInput({ onChange, disabled }: ImageUploadInputProps) 
   return (
     <div
       className={cn(
-        'relative w-full aspect-square rounded-lg border-2 border-dashed transition-colors',
+        'relative w-full h-40 rounded-lg border-2 border-dashed transition-colors cursor-pointer',
         isDragging
           ? 'border-primary bg-primary/5'
-          : 'border-muted-foreground/25 hover:border-muted-foreground/50',
+          : 'border-muted-foreground/25 hover:border-muted-foreground/50 hover:bg-muted/50',
         disabled && 'opacity-50 cursor-not-allowed'
       )}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
+      onClick={handleClick}
     >
       <input
+        ref={inputRef}
         type="file"
         accept="image/*"
         onChange={handleInputChange}
         disabled={disabled}
-        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+        className="hidden"
       />
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-          <Upload className="h-8 w-8 text-muted-foreground" />
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center pointer-events-none">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+          <Upload className="h-6 w-6 text-muted-foreground" />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-1">
           <p className="text-sm font-medium">
-            {isDragging ? 'Drop image here' : 'Drag & drop or click to upload'}
+            {isDragging ? 'Drop image here' : 'Click to upload or drag & drop'}
           </p>
           <p className="text-xs text-muted-foreground">
             PNG, JPG up to 5MB

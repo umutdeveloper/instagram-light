@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Heart, MessageCircle, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ModelsPostWithLikes } from '@/src/api/models';
@@ -15,6 +15,7 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, onLike }: PostCardProps) {
+  const router = useRouter();
   const [isLiking, setIsLiking] = useState(false);
   const [localIsLiked, setLocalIsLiked] = useState(post.isLiked || false);
   const [localLikesCount, setLocalLikesCount] = useState(post.likesCount || 0);
@@ -84,7 +85,14 @@ export function PostCard({ post, onLike }: PostCardProps) {
           {getUserInitials(post.username)}
         </div>
         <div className="flex-1">
-          <p className="font-semibold text-sm">{getDisplayName()}</p>
+          <button 
+            onClick={() => {
+              if (post.userId) router.push(`/profile/${post.userId}`);
+            }}
+            className="font-semibold text-sm hover:underline cursor-pointer text-left"
+          >
+            {getDisplayName()}
+          </button>
           {post.createdAt && (
             <p className="text-xs text-muted-foreground">{formatDate(post.createdAt)}</p>
           )}
@@ -94,12 +102,12 @@ export function PostCard({ post, onLike }: PostCardProps) {
       {/* Moderation Warning */}
       {post.flagged && (
         <div className="px-4 pb-3">
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
+          <div className="flex items-center gap-2 rounded-lg border bg-background px-4 py-3 text-sm">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <p className="text-sm">
               This post is under review for content moderation
-            </AlertDescription>
-          </Alert>
+            </p>
+          </div>
         </div>
       )}
 
@@ -161,7 +169,14 @@ export function PostCard({ post, onLike }: PostCardProps) {
       {post.caption && (
         <div className="px-4 py-2">
           <p className="text-sm whitespace-pre-wrap wrap-break-word">
-            <span className="font-semibold mr-2">{getDisplayName()}</span>
+            <button 
+              onClick={() => {
+                if (post.userId) router.push(`/profile/${post.userId}`);
+              }}
+              className="font-semibold mr-2 hover:underline cursor-pointer"
+            >
+              {getDisplayName()}
+            </button>
             {post.caption}
           </p>
         </div>

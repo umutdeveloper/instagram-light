@@ -4,6 +4,7 @@ import Cookies from 'js-cookie';
 
 interface User {
   username: string;
+  id: number;
 }
 
 interface AuthState {

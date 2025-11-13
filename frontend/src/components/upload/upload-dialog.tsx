@@ -103,15 +103,15 @@ export function UploadDialog({ open, onOpenChange, onSuccess }: UploadDialogProp
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[550px]">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-[550px] max-h-[90vh] flex flex-col p-0">
+        <DialogHeader className="px-6 pt-6 pb-4">
           <DialogTitle>Create New Post</DialogTitle>
           <DialogDescription>
             Upload a photo and add a caption to share with your followers.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 px-6 pb-4 overflow-y-auto flex-1">
           {/* Image Upload */}
           <div className="space-y-2">
             <Label>Photo</Label>
@@ -132,6 +132,7 @@ export function UploadDialog({ open, onOpenChange, onSuccess }: UploadDialogProp
               disabled={isUploading}
               rows={4}
               maxLength={500}
+              className="resize-none"
             />
             <p className="text-xs text-muted-foreground text-right">
               {caption.length}/500
@@ -157,7 +158,7 @@ export function UploadDialog({ open, onOpenChange, onSuccess }: UploadDialogProp
           )}
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="px-6 pb-6 pt-4 border-t">
           <Button
             variant="outline"
             onClick={handleClose}

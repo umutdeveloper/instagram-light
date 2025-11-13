@@ -6,6 +6,7 @@
 
 Name | Type
 ------------ | -------------
+`email` | string
 `password` | string
 `username` | string
 
@@ -16,6 +17,7 @@ import type { ModelsAuthRequest } from ''
 
 // TODO: Update the object below with actual values
 const example = {
+  "email": null,
   "password": null,
   "username": null,
 } satisfies ModelsAuthRequest

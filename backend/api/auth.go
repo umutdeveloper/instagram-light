@@ -33,11 +33,17 @@ func register(c *fiber.Ctx) error {
 	if err := c.BodyParser(&body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid request"})
 	}
+	// Use email as username if email is not provided
+	email := body.Email
+	if email == "" {
+		email = body.Username + "@example.com"
+	}
+
 	hashed, err := bcrypt.GenerateFromPassword([]byte(body.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": "Failed to hash password"})
 	}
-	user := models.User{Username: body.Username, Password: string(hashed)}
+	user := models.User{Username: body.Username, Email: email, Password: string(hashed)}
 	if err := db.DB.Create(&user).Error; err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": err.Error()})
 	}
