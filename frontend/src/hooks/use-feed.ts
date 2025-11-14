@@ -123,6 +123,32 @@ export function useFeed({ limit = 10 }: UseFeedOptions = {}) {
     [token]
   );
 
+  // Delete post
+  const deletePost = useCallback(
+    async (postId: number) => {
+      if (!token) return;
+
+      try {
+        const apiClient = createApiClients(token);
+        await apiClient.posts.apiPostsIdDelete({ id: postId });
+
+        // Remove post from the list
+        setPosts((prev) => prev.filter((post) => post.id !== postId));
+        
+        // Remove from liked posts if it was liked
+        setLikedPosts((prev) => {
+          const newSet = new Set(prev);
+          newSet.delete(postId);
+          return newSet;
+        });
+      } catch (err) {
+        console.error('Failed to delete post:', err);
+        throw err;
+      }
+    },
+    [token]
+  );
+
   // Load more posts
   const loadMore = useCallback(() => {
     const nextPage = pageRef.current + 1;
@@ -175,6 +201,7 @@ export function useFeed({ limit = 10 }: UseFeedOptions = {}) {
     hasMore,
     observerTarget,
     toggleLike,
+    deletePost,
     refresh,
     likedPosts,
   };

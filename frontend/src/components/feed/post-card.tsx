@@ -5,20 +5,44 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, MessageCircle, AlertCircle } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { PostDialog } from './post-dialog';
+import { Heart, MessageCircle, AlertCircle, MoreVertical, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { ModelsPostWithLikes } from '@/src/api/models';
 
 interface PostCardProps {
   post: ModelsPostWithLikes;
   onLike: (postId: number) => Promise<void>;
+  onDelete?: (postId: number) => Promise<void>;
+  currentUserId?: number;
 }
 
-export function PostCard({ post, onLike }: PostCardProps) {
+export function PostCard({ post, onLike, onDelete, currentUserId }: PostCardProps) {
   const router = useRouter();
   const [isLiking, setIsLiking] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showPostDialog, setShowPostDialog] = useState(false);
   const [localIsLiked, setLocalIsLiked] = useState(post.isLiked || false);
   const [localLikesCount, setLocalLikesCount] = useState(post.likesCount || 0);
+
+  const isOwnPost = currentUserId && post.userId === currentUserId;
 
   // Convert relative path to absolute URL
   const getImageUrl = (mediaUrl?: string) => {
@@ -49,6 +73,21 @@ export function PostCard({ post, onLike }: PostCardProps) {
       console.error('Failed to toggle like:', error);
     } finally {
       setIsLiking(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!post.id || !onDelete || isDeleting) return;
+
+    setIsDeleting(true);
+    try {
+      await onDelete(post.id);
+      setShowDeleteDialog(false);
+    } catch (error) {
+      console.error('Failed to delete post:', error);
+      alert('Failed to delete post');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -97,23 +136,52 @@ export function PostCard({ post, onLike }: PostCardProps) {
             <p className="text-xs text-muted-foreground">{formatDate(post.createdAt)}</p>
           )}
         </div>
+        {isOwnPost && onDelete && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => setShowDeleteDialog(true)}
+                className="text-destructive focus:text-destructive cursor-pointer"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Post
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
-      {/* Moderation Warning */}
-      {post.flagged && (
-        <div className="px-4 pb-3">
-          <div className="flex items-center gap-2 rounded-lg border bg-background px-4 py-3 text-sm">
-            <AlertCircle className="h-4 w-4 shrink-0" />
-            <p className="text-sm">
-              This post is under review for content moderation
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Post?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this post? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
+      {/* Moderation Warning */}
       {/* Image */}
       {post.mediaUrl && (
-        <div className="relative w-full aspect-square bg-muted">
+        <div className="relative w-full aspect-square bg-muted overflow-hidden">
           <Image
             src={getImageUrl(post.mediaUrl)}
             alt={post.caption || 'Post image'}
@@ -121,15 +189,28 @@ export function PostCard({ post, onLike }: PostCardProps) {
             unoptimized
             className={cn(
               'object-cover',
-              post.flagged && 'blur-lg'
+              post.flagged && 'blur-xl'
             )}
             sizes="(max-width: 768px) 100vw, 600px"
           />
           {post.flagged && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-              <p className="text-white font-semibold text-center px-4">
-                Content Under Review
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 text-white text-center p-4">
+              <AlertCircle className="h-12 w-12 mb-3 text-yellow-500" />
+              <h3 className="font-semibold mb-2">Sensitive Content Warning</h3>
+              <p className="text-sm opacity-90 mb-4">
+                This content may contain sensitive images
               </p>
+              <Button 
+                variant="secondary"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowPostDialog(true);
+                }}
+                className="bg-white/20 hover:bg-white/30 text-white border-white/20"
+              >
+                View post
+              </Button>
             </div>
           )}
         </div>
@@ -181,6 +262,37 @@ export function PostCard({ post, onLike }: PostCardProps) {
           </p>
         </div>
       )}
+
+      {/* Post Dialog */}
+      <PostDialog
+        post={post}
+        open={showPostDialog}
+        onOpenChange={setShowPostDialog}
+        onLike={onLike}
+        onDelete={onDelete}
+        currentUserId={currentUserId}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Post?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this post? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

@@ -1,12 +1,14 @@
 'use client';
 
 import { useFeed } from '@/src/hooks/use-feed';
+import { useAuthStore } from '@/src/stores/auth-store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { PostCard } from '@/src/components/feed/post-card';
 import { Loader2 } from 'lucide-react';
 
 export default function FeedPage() {
+  const { user } = useAuthStore();
   const {
     posts,
     isLoading,
@@ -14,6 +16,8 @@ export default function FeedPage() {
     hasMore,
     observerTarget,
     toggleLike,
+    deletePost,
+    refresh,
   } = useFeed({ limit: 10 });
 
   return (
@@ -58,6 +62,8 @@ export default function FeedPage() {
                   key={post.id}
                   post={post}
                   onLike={toggleLike}
+                  onDelete={deletePost}
+                  currentUserId={user?.id}
                 />
               ))}
 
